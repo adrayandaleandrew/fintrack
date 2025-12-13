@@ -5,6 +5,9 @@ import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/categories/presentation/pages/category_list_page.dart';
 import '../../features/accounts/presentation/pages/account_list_page.dart';
+import '../../features/transactions/presentation/pages/transaction_list_page.dart';
+import '../../features/transactions/presentation/pages/transaction_form_page.dart';
+import '../../features/transactions/presentation/pages/transaction_detail_page.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
@@ -63,28 +66,19 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.transactions,
           name: RouteNames.transactions,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Transactions',
-            description: 'Transaction list with filtering and search',
-          ),
+          builder: (context, state) => const TransactionListPage(),
           routes: [
             GoRoute(
               path: 'add',
               name: RouteNames.addTransaction,
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Add Transaction',
-                description: 'Form to add new transaction',
-              ),
+              builder: (context, state) => const TransactionFormPage(),
             ),
             GoRoute(
               path: ':id',
               name: RouteNames.transactionDetail,
               builder: (context, state) {
                 final id = state.pathParameters['id']!;
-                return _PlaceholderPage(
-                  title: 'Transaction Detail',
-                  description: 'Details for transaction $id',
-                );
+                return TransactionDetailPage(transactionId: id);
               },
             ),
             GoRoute(

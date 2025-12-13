@@ -64,6 +64,22 @@ import '../../features/accounts/domain/usecases/get_accounts.dart';
 import '../../features/accounts/domain/usecases/update_account.dart';
 import '../../features/accounts/presentation/bloc/account_bloc.dart';
 
+// Transactions
+import '../../features/transactions/data/datasources/transaction_local_datasource.dart';
+import '../../features/transactions/data/datasources/transaction_local_datasource_impl.dart';
+import '../../features/transactions/data/datasources/transaction_remote_datasource.dart';
+import '../../features/transactions/data/datasources/transaction_remote_datasource_mock.dart';
+import '../../features/transactions/data/repositories/transaction_repository_impl.dart';
+import '../../features/transactions/domain/repositories/transaction_repository.dart';
+import '../../features/transactions/domain/usecases/create_transaction.dart';
+import '../../features/transactions/domain/usecases/delete_transaction.dart';
+import '../../features/transactions/domain/usecases/filter_transactions.dart';
+import '../../features/transactions/domain/usecases/get_transaction_by_id.dart';
+import '../../features/transactions/domain/usecases/get_transactions.dart';
+import '../../features/transactions/domain/usecases/search_transactions.dart';
+import '../../features/transactions/domain/usecases/update_transaction.dart';
+import '../../features/transactions/presentation/bloc/transaction_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -294,44 +310,45 @@ Future<void> initializeDependencies() async {
   // ==================== Transactions Feature ====================
 
   // Data Sources
-  // sl.registerLazySingleton<TransactionRemoteDataSource>(
-  //   () => TransactionRemoteDataSourceMock(),
-  // );
+  sl.registerLazySingleton<TransactionRemoteDataSource>(
+    () => TransactionRemoteDataSourceMock(
+      accountDataSource: sl(),
+    ),
+  );
 
-  // sl.registerLazySingleton<TransactionLocalDataSource>(
-  //   () => TransactionLocalDataSourceImpl(database: sl()),
-  // );
+  sl.registerLazySingleton<TransactionLocalDataSource>(
+    () => TransactionLocalDataSourceImpl(hive: sl()),
+  );
 
   // Repositories
-  // sl.registerLazySingleton<TransactionRepository>(
-  //   () => TransactionRepositoryImpl(
-  //     remoteDataSource: sl(),
-  //     localDataSource: sl(),
-  //     networkInfo: sl(),
-  //   ),
-  // );
+  sl.registerLazySingleton<TransactionRepository>(
+    () => TransactionRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
 
   // Use Cases
-  // sl.registerLazySingleton(() => GetTransactions(repository: sl()));
-  // sl.registerLazySingleton(() => GetTransactionById(repository: sl()));
-  // sl.registerLazySingleton(() => CreateTransaction(repository: sl()));
-  // sl.registerLazySingleton(() => UpdateTransaction(repository: sl()));
-  // sl.registerLazySingleton(() => DeleteTransaction(repository: sl()));
-  // sl.registerLazySingleton(() => FilterTransactions(repository: sl()));
-  // sl.registerLazySingleton(() => SearchTransactions(repository: sl()));
+  sl.registerLazySingleton(() => GetTransactions(repository: sl()));
+  sl.registerLazySingleton(() => GetTransactionById(repository: sl()));
+  sl.registerLazySingleton(() => CreateTransaction(repository: sl()));
+  sl.registerLazySingleton(() => UpdateTransaction(repository: sl()));
+  sl.registerLazySingleton(() => DeleteTransaction(repository: sl()));
+  sl.registerLazySingleton(() => FilterTransactions(repository: sl()));
+  sl.registerLazySingleton(() => SearchTransactions(repository: sl()));
 
   // BLoC
-  // sl.registerFactory(
-  //   () => TransactionBloc(
-  //     getTransactions: sl(),
-  //     getTransactionById: sl(),
-  //     createTransaction: sl(),
-  //     updateTransaction: sl(),
-  //     deleteTransaction: sl(),
-  //     filterTransactions: sl(),
-  //     searchTransactions: sl(),
-  //   ),
-  // );
+  sl.registerFactory(
+    () => TransactionBloc(
+      getTransactions: sl(),
+      getTransactionById: sl(),
+      createTransaction: sl(),
+      updateTransaction: sl(),
+      deleteTransaction: sl(),
+      filterTransactions: sl(),
+      searchTransactions: sl(),
+    ),
+  );
 
   // ==================== Budgets Feature ====================
 
