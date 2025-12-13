@@ -381,8 +381,51 @@ Closes #45
 **Files Created:** 18+ files (~2,800 lines of code)
 **Mock Data:** 25 default categories for 'user_1'
 
+### 🔄 Phase 4: Transactions (IN PROGRESS - 35%)
+
+**Current Status:** Domain layer complete, Data layer in progress
+
+**Completed So Far:**
+- ✅ Transaction entity with TransactionType enum (Income, Expense, Transfer)
+- ✅ TransactionRepository interface with 12 methods (CRUD, filter, search, analytics)
+- ✅ 6 use cases implemented:
+  - GetTransactions - Fetch all transactions for user
+  - GetTransactionById - Fetch single transaction
+  - CreateTransaction - Create with validation and balance updates
+  - UpdateTransaction - Update with balance recalculation
+  - DeleteTransaction - Delete with balance restoration
+  - FilterTransactions - Multi-criteria filtering (date, account, category, type)
+  - SearchTransactions - Search by description/notes
+- ✅ TransactionModel with JSON serialization support
+- ✅ Clean Architecture domain layer complete
+
+**In Progress:**
+- 🔄 Transaction data sources (remote mock with balance updates, local Hive storage)
+- 🔄 TransactionRepository implementation with account balance management
+- ⏳ TransactionBloc (pending)
+- ⏳ Transaction pages: list, add/edit, detail (pending)
+- ⏳ Transaction widgets (pending)
+
+**Key Features Being Built:**
+- Income, Expense, and Transfer transaction types
+- Automatic account balance updates on create/update/delete
+- Transfer transactions affect both source and destination accounts
+- Multi-criteria filtering (date range, account, category, type)
+- Search functionality (description and notes)
+- Recent transactions for dashboard
+- Transaction totals by type for analytics
+
+**Technical Complexity:**
+- Balance update logic for all transaction operations
+- Transfer handling (affects two accounts simultaneously)
+- Recalculation on updates (undo old transaction, apply new one)
+- Validation (amount > 0, required fields, transfer constraints)
+
+**Files Created So Far:** 8+ files (~1,200 lines of code)
+**Estimated Total:** 30+ files (~5,000+ lines of code when complete)
+
 ### 📋 Next Phases:
-- **Phase 4:** Transactions (income/expense/transfer with filtering)
+- **Phase 4:** Transactions (income/expense/transfer with filtering) - IN PROGRESS
 - **Phase 5:** Dashboard (summary cards, charts, recent transactions)
 - **Phase 6:** Budget Tracking (alerts, progress indicators)
 - **Phase 7:** Recurring Transactions (auto-generation)
@@ -426,4 +469,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Last Updated:** 2025-12-13
 **Version:** 1.0.0
-**Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Ready for Phase 4
+**Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (IN PROGRESS - 35%)

@@ -1533,9 +1533,334 @@ flutter pub run build_runner build --delete-conflicting-outputs
 
 **Ready for:** Phase 4 - Transactions
 
+---
+
+## 🔄 Phase 4: Transactions (IN PROGRESS - Week 4-5, 35%)
+
+**Duration:** Week 4-5 (Started 2025-12-13)
+**Priority:** CRITICAL (Core feature)
+**Dependencies:** Phase 1 (Foundation) ✅, Phase 2 (Accounts) ✅, Phase 3 (Categories) ✅
+
+### Implementation Overview
+
+Complete transaction management system following Clean Architecture with BLoC pattern. This is the core feature that brings accounts and categories together, enabling users to track income, expenses, and transfers with automatic balance updates.
+
+### Current Progress
+
+#### 1. Domain Layer ✅ (COMPLETE - 100%)
+**Files Created:**
+- `lib/features/transactions/domain/entities/transaction.dart` (~200 lines)
+  - Transaction entity with 14 properties
+  - TransactionType enum (Income, Expense, Transfer)
+  - Equatable implementation for value equality
+  - Helper methods: isTransfer, isIncome, isExpense, signedAmount
+  - Enum helpers: displayName, iconName, colorHex, increasesBalance, decreasesBalance
+  - Properties: id, userId, accountId, categoryId, type, amount, currency, description, date, notes, tags, receiptUrl, toAccountId, createdAt, updatedAt
+
+- `lib/features/transactions/domain/repositories/transaction_repository.dart` (~150 lines)
+  - Repository interface with 12 methods
+  - Returns `Either<Failure, T>` for functional error handling
+  - Methods:
+    - getTransactions - Get all for user
+    - getTransactionById - Get single by ID
+    - createTransaction - Create with balance updates
+    - updateTransaction - Update with balance recalculation
+    - deleteTransaction - Delete with balance restoration
+    - filterTransactions - Multi-criteria filtering
+    - searchTransactions - Search by description/notes
+    - getTransactionsByAccount - Filter by account
+    - getTransactionsByCategory - Filter by category
+    - getTransactionsByDateRange - Filter by date
+    - getTotalByType - Calculate totals (income/expense)
+    - getRecentTransactions - Get N most recent
+
+- `lib/features/transactions/domain/usecases/` (6 files, ~450 lines total)
+  - **GetTransactions** - Fetch all transactions for user, ordered by date
+  - **GetTransactionById** - Fetch single transaction
+  - **CreateTransaction** - Create with validation:
+    - Amount must be > 0
+    - Description required
+    - For transfers: toAccountId required and different from accountId
+  - **UpdateTransaction** - Update with validation:
+    - Same rules as create
+    - Cannot change transaction type
+    - Recalculates balances
+  - **DeleteTransaction** - Delete and restore account balances
+  - **FilterTransactions** - Multi-criteria filtering:
+    - Date range (startDate, endDate)
+    - Account ID
+    - Category ID
+    - Transaction type
+  - **SearchTransactions** - Search by description/notes:
+    - Case-insensitive search
+    - Query validation (not empty)
+
+**Patterns Used:**
+- Single Responsibility (one use case per operation)
+- Either monad for error handling
+- Params classes for complex inputs
+- Validation in use cases (business rules)
+
+#### 2. Data Layer 🔄 (IN PROGRESS - 20%)
+**Files Created:**
+- `lib/features/transactions/data/models/transaction_model.dart` (~110 lines)
+  - Extends Transaction entity
+  - JSON serialization with json_annotation
+  - Factory constructors: fromJson, fromEntity, toEntity
+  - Auto-generated code with build_runner (pending)
+
+**Still To Create:**
+- `lib/features/transactions/data/datasources/transaction_remote_datasource.dart` (interface)
+- `lib/features/transactions/data/datasources/transaction_remote_datasource_mock.dart` (implementation)
+  - In-memory storage with Map<String, List<TransactionModel>>
+  - **Critical:** Balance update logic for accounts
+  - Pre-populated sample transactions
+  - Validation rules (amount > 0, required fields, transfer validation)
+  - Simulates network delay (300-500ms)
+  - Throws ServerException on validation failures
+
+- `lib/features/transactions/data/datasources/transaction_local_datasource.dart` (interface)
+- `lib/features/transactions/data/datasources/transaction_local_datasource_impl.dart` (Hive)
+  - Hive box: 'transactions'
+  - Storage structure: Map<userId, List<TransactionModel>>
+  - CRUD operations with Hive
+  - Throws CacheException on failures
+
+- `lib/features/transactions/data/repositories/transaction_repository_impl.dart`
+  - Implements TransactionRepository interface
+  - Cache-first strategy with remote fallback
+  - **Critical:** Account balance update coordination
+  - Proper exception → failure conversion
+  - Balance update flow:
+    - Create: Fetch old balance → Apply transaction → Update balance
+    - Update: Reverse old transaction → Apply new transaction
+    - Delete: Reverse transaction effect
+    - Transfer: Update both source and destination accounts
+
+**Balance Update Logic (Critical Feature):**
+```dart
+// Income: balance += amount
+// Expense: balance -= amount
+// Transfer:
+//   - Source account: balance -= amount
+//   - Destination account: balance += amount
+```
+
+#### 3. Presentation Layer ⏳ (PENDING - 0%)
+**To Be Created:**
+- `lib/features/transactions/presentation/bloc/transaction_event.dart`
+  - LoadTransactions(userId)
+  - LoadTransactionById(id)
+  - CreateTransactionRequested(transaction)
+  - UpdateTransactionRequested(transaction)
+  - DeleteTransactionRequested(id)
+  - FilterTransactionsRequested(filters)
+  - SearchTransactionsRequested(query)
+
+- `lib/features/transactions/presentation/bloc/transaction_state.dart`
+  - TransactionInitial
+  - TransactionLoading
+  - TransactionsLoaded (with helper methods for filtering)
+  - TransactionLoaded
+  - TransactionActionSuccess(message)
+  - TransactionError(message)
+
+- `lib/features/transactions/presentation/bloc/transaction_bloc.dart`
+  - Handles all event types
+  - Proper error handling with fold
+  - Success messages for user feedback
+  - Dependencies: 6+ use cases injected
+
+- `lib/features/transactions/presentation/pages/transaction_list_page.dart`
+  - Summary card showing totals (income, expense, balance)
+  - Transactions grouped by date (Today, Yesterday, This Week, etc.)
+  - Filter button (opens filter dialog)
+  - Search functionality
+  - Swipe-to-delete with confirmation
+  - Color-coded by type (green=income, red=expense, blue=transfer)
+  - Tap to view detail
+  - FAB to add new transaction
+  - Loading/error/empty states
+  - Pagination for large lists
+
+- `lib/features/transactions/presentation/pages/transaction_form_page.dart`
+  - Create/Edit mode with single page
+  - Type selector (Income/Expense/Transfer)
+  - Amount input with currency
+  - Account selector (dropdown or bottom sheet)
+  - Category selector (chips or dropdown)
+  - For transfers: destination account selector
+  - Description text field
+  - Date picker (default: today)
+  - Optional: Notes, Tags, Receipt upload
+  - Form validation
+  - Save/Cancel buttons
+  - BlocListener for success/error
+  - Live balance preview (shows balance after transaction)
+
+- `lib/features/transactions/presentation/pages/transaction_detail_page.dart`
+  - Full transaction details
+  - Edit button (navigates to form)
+  - Delete button with confirmation
+  - Related account info
+  - Related category info
+  - For transfers: both accounts displayed
+  - Receipt display (if available)
+  - Tags display
+  - Created/Updated timestamps
+
+- `lib/features/transactions/presentation/widgets/` (5+ widgets)
+  - **transaction_list_item.dart** - List item with icon, description, amount, date
+  - **transaction_filter_dialog.dart** - Filter UI (date range, account, category, type)
+  - **transaction_summary_card.dart** - Summary statistics (income, expense, balance)
+  - **account_selector.dart** - Reusable account picker
+  - **amount_input.dart** - Formatted amount input with currency
+
+**UI Features:**
+- Summary statistics card
+- Grouped list view by date
+- Color-coded transaction types
+- Filter and search
+- Swipe actions
+- Form validation with error messages
+- Confirmation dialogs
+- Loading/error/empty states
+- Live balance preview in form
+
+#### 4. Infrastructure ⏳ (PENDING - 0%)
+**Files To Update:**
+- `lib/core/di/injection_container.dart`
+  - Register TransactionRemoteDataSource (mock)
+  - Register TransactionLocalDataSource (Hive)
+  - Register TransactionRepository
+  - Register 6+ use cases
+  - Register TransactionBloc as factory
+  - All dependencies properly wired
+
+- `lib/app/router/app_router.dart`
+  - Add TransactionListPage import
+  - Update /transactions route to use TransactionListPage
+  - Add sub-routes: /transactions/add, /transactions/:id, /transactions/:id/edit
+  - Pass userId from auth state
+
+- `lib/main.dart`
+  - Add TransactionBloc to MultiBlocProvider
+
+#### 5. Code Generation ⏳ (PENDING - 0%)
+**Commands To Run:**
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+**Files To Generate:**
+- `transaction_model.g.dart` - JSON serialization code
+
+### Technical Challenges
+
+#### Balance Update Complexity
+The most critical aspect of this feature is maintaining account balance consistency:
+
+1. **Create Transaction:**
+   - Fetch current account balance
+   - Apply transaction (income adds, expense subtracts)
+   - Update account in database
+   - For transfers: update both accounts atomically
+
+2. **Update Transaction:**
+   - Fetch old transaction
+   - Reverse old transaction effect on balance
+   - Apply new transaction effect
+   - Handle account changes (if user changes which account)
+
+3. **Delete Transaction:**
+   - Fetch transaction
+   - Reverse transaction effect on balance
+   - For transfers: reverse on both accounts
+
+4. **Transfer Validation:**
+   - Source and destination must be different
+   - Both accounts must exist
+   - Source must have sufficient balance (optional check)
+   - Currency handling (same or conversion)
+
+#### Filtering Performance
+With potentially thousands of transactions:
+- Implement pagination (load 50 at a time)
+- Index by date for efficient range queries
+- Cache filter results
+- Use Hive queries for local filtering
+
+#### Data Consistency
+- Ensure balance updates are atomic (both transaction and account)
+- Handle concurrent updates gracefully
+- Validate data integrity on app start
+- Provide balance recalculation utility (admin function)
+
+### What Will Work When Complete
+
+#### Transaction Management
+- ✅ Create income transactions (money coming in)
+- ✅ Create expense transactions (money going out)
+- ✅ Create transfer transactions (between accounts)
+- ✅ Edit transactions with balance recalculation
+- ✅ Delete transactions with balance restoration
+- ✅ View transaction details
+
+#### Balance Management
+- ✅ Automatic balance updates on create/edit/delete
+- ✅ Transfer handling (affects two accounts)
+- ✅ Balance validation (prevents negative balance for certain account types)
+- ✅ Real-time balance preview in transaction form
+
+#### Filtering & Search
+- ✅ Filter by date range (today, week, month, custom)
+- ✅ Filter by account
+- ✅ Filter by category
+- ✅ Filter by type (income/expense/transfer)
+- ✅ Search by description or notes
+- ✅ Combine multiple filters
+
+#### UI Features
+- ✅ Transaction list grouped by date
+- ✅ Color-coded transaction types
+- ✅ Summary card (total income, expense, balance)
+- ✅ Swipe-to-delete
+- ✅ Filter and search UI
+- ✅ Transaction detail page
+- ✅ Form validation
+- ✅ Loading/error/empty states
+
+#### Data Management
+- ✅ Offline support with Hive caching
+- ✅ Cache-first strategy with remote fallback
+- ✅ Pre-populated sample transactions
+- ✅ Validation prevents invalid transactions
+- ✅ Simulated network delays
+
+### Files Created So Far
+
+**Domain Layer (Complete):**
+- transaction.dart (~200 lines)
+- transaction_repository.dart (~150 lines)
+- get_transactions.dart (~35 lines)
+- get_transaction_by_id.dart (~30 lines)
+- create_transaction.dart (~70 lines)
+- update_transaction.dart (~70 lines)
+- delete_transaction.dart (~30 lines)
+- filter_transactions.dart (~60 lines)
+- search_transactions.dart (~45 lines)
+
+**Data Layer (In Progress):**
+- transaction_model.dart (~110 lines)
+
+**Total So Far:** 8 files (~800 lines of code)
+**Estimated Total When Complete:** 30+ files (~5,000+ lines of code)
+
+**In Progress:** Data sources and repository implementation
+
 ### 📋 Upcoming Phases
 
-- **Phase 4:** Transactions (Week 4-5) - CRITICAL
+- **Phase 4:** Transactions (Week 4-5) - CRITICAL - IN PROGRESS (35%)
 - **Phase 5:** Dashboard (Week 5)
 - **Phase 6:** Budget Tracking (Week 6)
 - **Phase 7:** Recurring Transactions (Week 7)
@@ -1549,6 +1874,6 @@ See `.claude/plans/jolly-riding-badger.md` for complete 12-week implementation p
 
 **Last Updated:** 2025-12-13
 **Claude Version Used:** Claude Sonnet 4.5
-**Implementation Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅)
-**Current Focus:** Ready for Phase 4 - Transactions
-**Next Tasks:** Transaction entity, CRUD operations, account balance updates, filtering/search
+**Implementation Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (IN PROGRESS - 35%)
+**Current Focus:** Phase 4 - Transactions (Data Layer - building data sources with balance update logic)
+**Next Tasks:** Transaction remote/local data sources, repository implementation with balance updates, BLoC, pages, widgets
