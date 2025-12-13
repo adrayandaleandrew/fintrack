@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
+import '../../features/categories/presentation/pages/category_list_page.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
@@ -145,9 +146,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.categories,
           name: RouteNames.categories,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Categories',
-            description: 'List of all categories',
+          builder: (context, state) => const CategoryListPage(
+            userId: 'user_1', // TODO: Get from auth state
           ),
           routes: [
             GoRoute(

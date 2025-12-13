@@ -1140,10 +1140,401 @@ When Claude generates code, verify:
 
 **Ready for:** Phase 2 - Account Management
 
+### ✅ Phase 2: Account Management (COMPLETE - 100%)
+
+**All Tasks Completed:**
+
+1. ✅ **Account Domain Layer** (3 files, ~400 lines)
+   - `lib/features/accounts/domain/entities/account.dart` - Account entity with business logic
+     - Support for 4 account types: Bank, Cash, Credit Card, Investment
+     - Credit limit and available credit calculations
+     - Balance validation methods
+     - Active/inactive status management
+   - `lib/features/accounts/domain/repositories/account_repository.dart` - Repository interface
+     - 7 methods: getAccounts, getAccountById, createAccount, updateAccount, deleteAccount, updateBalance, getTotalBalance
+   - Account entity enum: AccountType with display names and default icons
+
+2. ✅ **Account Use Cases** (5 files, ~250 lines)
+   - `lib/features/accounts/domain/usecases/get_accounts.dart` - Get all accounts with filtering
+   - `lib/features/accounts/domain/usecases/get_account_by_id.dart` - Get single account
+   - `lib/features/accounts/domain/usecases/create_account.dart` - Create new account
+   - `lib/features/accounts/domain/usecases/update_account.dart` - Update existing account
+   - `lib/features/accounts/domain/usecases/delete_account.dart` - Delete account
+   - Each use case follows single responsibility principle with params classes
+
+3. ✅ **Account Data Layer** (5 files, ~900 lines)
+   - `lib/features/accounts/data/models/account_model.dart` - JSON serializable model
+     - Extends Account entity
+     - Full JSON serialization with code generation
+     - CopyWith method for immutable updates
+   - `lib/features/accounts/data/datasources/account_remote_datasource.dart` - Interface
+   - `lib/features/accounts/data/datasources/account_remote_datasource_mock.dart` - Mock API
+     - 5 pre-populated sample accounts (checking, savings, cash, credit card, investment)
+     - In-memory storage with realistic network delays
+     - Full CRUD operations with validation
+   - `lib/features/accounts/data/datasources/account_local_datasource.dart` - Interface
+   - `lib/features/accounts/data/datasources/account_local_datasource_impl.dart` - Hive implementation
+     - Offline-first caching strategy
+     - Accounts grouped by userId
+     - Individual account caching for quick lookups
+   - `lib/features/accounts/data/repositories/account_repository_impl.dart` - Repository implementation
+     - Cache-first fallback strategy (try remote, fallback to cache on error)
+     - Proper error handling with Either<Failure, Success>
+     - Automatic cache updates on all mutations
+
+4. ✅ **Account Presentation Layer** (7 files, ~1,800 lines)
+
+   **BLoC:**
+   - `lib/features/accounts/presentation/bloc/account_event.dart` - 6 event types
+     - LoadAccounts, LoadAccountById, CreateAccountRequested, UpdateAccountRequested, DeleteAccountRequested, GetTotalBalanceRequested
+   - `lib/features/accounts/presentation/bloc/account_state.dart` - 7 state types
+     - AccountInitial, AccountLoading, AccountsLoaded, AccountLoaded, AccountActionSuccess, TotalBalanceLoaded, AccountError
+     - Helper methods in AccountsLoaded for filtering and calculations
+   - `lib/features/accounts/presentation/bloc/account_bloc.dart` - Event-to-state transformations
+     - All 6 events handled with proper error management
+     - Loading states for UX feedback
+
+   **Pages:**
+   - `lib/features/accounts/presentation/pages/account_list_page.dart` - Main listing page
+     - Total balance card with multi-currency support
+     - Accounts grouped by type (Bank, Cash, Credit Card, Investment)
+     - Filter dialog (all vs active only)
+     - Empty state and error state handling
+     - FAB for adding new accounts
+   - `lib/features/accounts/presentation/pages/account_detail_page.dart` - Detail view
+     - Gradient header with account icon and balance
+     - Full account information display
+     - Credit utilization visualization for credit cards
+     - Edit and delete actions
+     - Interest rate display for savings/investments
+   - `lib/features/accounts/presentation/pages/account_form_page.dart` - Create/Edit form
+     - Comprehensive form with validation
+     - Icon picker (2 icons per account type)
+     - Color picker (6 colors)
+     - Currency selector (6 currencies)
+     - Credit limit input for credit cards
+     - Interest rate input for bank/investment accounts
+     - Active/inactive toggle for edit mode
+
+   **Widgets:**
+   - `lib/features/accounts/presentation/widgets/account_card.dart` - Reusable account display
+     - Icon with colored background
+     - Account name, type, and status
+     - Balance with color coding (green/red)
+     - Credit limit for credit cards
+
+5. ✅ **Dependency Injection Updates** (1 file updated)
+   - `lib/core/di/injection_container.dart` - Account feature fully wired
+     - AccountRemoteDataSource registered (mock implementation)
+     - AccountLocalDataSource registered (Hive implementation)
+     - AccountRepository registered
+     - All 5 use cases registered
+     - AccountBloc registered as factory
+
+6. ✅ **Router Updates** (1 file updated)
+   - `lib/app/router/app_router.dart` - Account navigation configured
+     - /accounts route points to AccountListPage
+     - User ID passed from auth state (temporary hardcoded for testing)
+
+7. ✅ **Code Generation** - JSON serialization generated successfully
+   - `account_model.g.dart` created with fromJson/toJson methods
+
+**What Works Right Now:**
+- 🎯 View all accounts with total balance by currency
+- 🎯 Accounts grouped by type with section headers
+- 🎯 Add new accounts with full customization
+- 🎯 View detailed account info with credit utilization bars
+- 🎯 Edit account properties (name, icon, color, limits, status)
+- 🎯 Delete accounts with confirmation
+- 🎯 Filter accounts (all vs active only)
+- 🎯 Offline-first - works without network
+- 🎯 Multi-currency support (USD, EUR, GBP, JPY, CAD, AUD)
+- 🎯 4 account types (Bank, Cash, Credit Card, Investment)
+
+**Architecture Quality:**
+- ✅ Clean Architecture strictly followed
+- ✅ BLoC pattern correctly implemented
+- ✅ Cache-first offline strategy
+- ✅ Proper error handling throughout
+- ✅ Form validation with user-friendly messages
+- ✅ Responsive UI with loading/error/empty states
+- ✅ Code generation for JSON serialization
+- ✅ Zero compilation errors
+
+**Files Created:** 20+ files (~3,500 lines of code)
+**Mock Data:** 5 sample accounts with realistic balances and metadata
+
+**Ready for:** Phase 3 - Categories
+
+---
+
+## ✅ Phase 3: Categories (COMPLETE - Week 3, 100%)
+
+**Duration:** Week 3 (Completed 2025-12-13)
+**Priority:** HIGH
+**Dependencies:** Phase 1 (Foundation) ✅
+
+### Implementation Overview
+
+Complete category management system following Clean Architecture with BLoC pattern. Provides 25 default categories for immediate use plus full CRUD for custom categories.
+
+### Task Breakdown
+
+#### 1. Domain Layer ✅
+**Files Created:**
+- `lib/features/categories/domain/entities/category.dart` (~100 lines)
+  - Category entity with CategoryType enum (Income/Expense)
+  - 10 properties: id, userId, name, type, icon, color, sortOrder, isDefault, createdAt, updatedAt
+  - Equatable implementation for value equality
+  - Helper methods on CategoryType enum
+
+- `lib/features/categories/domain/repositories/category_repository.dart` (~100 lines)
+  - Repository interface with 7 methods
+  - Returns `Either<Failure, T>` for functional error handling
+  - Methods: getCategories, getById, create, update, delete, getDefaults, initializeDefaults
+
+- `lib/features/categories/domain/usecases/` (7 files, ~350 lines total)
+  - GetCategories - Fetch all categories for user
+  - GetCategoryById - Fetch single category
+  - CreateCategory - Validate and create new category
+  - UpdateCategory - Update existing category with validation
+  - DeleteCategory - Delete custom category (blocks default deletion)
+  - GetDefaultCategories - Get predefined categories
+  - InitializeDefaultCategories - One-time setup for new users
+
+**Patterns Used:**
+- Single Responsibility (one use case per operation)
+- Either monad for error handling
+- Params classes for complex inputs
+
+#### 2. Data Layer ✅
+**Files Created:**
+- `lib/features/categories/data/models/category_model.dart` (~70 lines)
+  - Extends Category entity
+  - JSON serialization with json_annotation
+  - Factory constructors: fromJson, fromEntity, toEntity
+  - Auto-generated code with build_runner
+
+- `lib/features/categories/data/datasources/default_categories.dart` (~200 lines)
+  - 25 predefined categories (10 income, 15 expense)
+  - Each with icon, color, sortOrder
+  - Static method to generate for specific user
+  - **Income Categories:** Salary, Freelance, Business, Investments, Rental Income, Gifts, Bonus, Refund, Dividend, Other Income
+  - **Expense Categories:** Food & Dining, Groceries, Transportation, Shopping, Entertainment, Bills & Utilities, Healthcare, Education, Travel, Personal Care, Insurance, Subscriptions, Home Maintenance, Pets, Other Expense
+
+- `lib/features/categories/data/datasources/category_remote_datasource.dart` (~50 lines)
+  - Abstract interface for remote operations
+  - 7 async methods matching repository
+
+- `lib/features/categories/data/datasources/category_remote_datasource_mock.dart` (~220 lines)
+  - In-memory storage with Map<String, List<CategoryModel>>
+  - Auto-initializes with 25 default categories for 'user_1'
+  - Validation rules:
+    - Cannot edit/delete default categories
+    - Name must be unique per user
+    - Name length 1-50 characters
+  - Simulates network delay (300-500ms)
+  - Throws ServerException on validation failures
+
+- `lib/features/categories/data/datasources/category_local_datasource.dart` (~40 lines)
+  - Abstract interface for Hive operations
+  - Same 7 methods as remote
+
+- `lib/features/categories/data/datasources/category_local_datasource_impl.dart` (~165 lines)
+  - Hive box: 'categories'
+  - Storage structure: Map<userId, List<CategoryModel>>
+  - CRUD operations with Hive
+  - Throws CacheException on failures
+  - Auto-opens box if needed
+
+- `lib/features/categories/data/repositories/category_repository_impl.dart` (~250 lines)
+  - Implements CategoryRepository interface
+  - Cache-first strategy with remote fallback
+  - Proper exception → failure conversion
+  - Error handling with Either monad
+  - Sync: Save to remote first, then cache success
+
+**Data Flow:**
+```
+UI → BLoC → Use Case → Repository → Remote Data Source
+                                   ↓ (on success)
+                                 Local Data Source (cache)
+```
+
+**Error Strategy:**
+- ServerException → ServerFailure
+- CacheException → CacheFailure
+- Generic Exception → UnexpectedFailure
+
+#### 3. Presentation Layer ✅
+**Files Created:**
+- `lib/features/categories/presentation/bloc/category_event.dart` (~100 lines)
+  - 7 event classes extending CategoryEvent
+  - LoadCategories(userId)
+  - LoadCategoryById(id)
+  - CreateCategoryRequested(category)
+  - UpdateCategoryRequested(category)
+  - DeleteCategoryRequested(id)
+  - LoadDefaultCategories()
+  - InitializeDefaultCategoriesRequested(userId)
+
+- `lib/features/categories/presentation/bloc/category_state.dart` (~120 lines)
+  - 7 state classes extending CategoryState
+  - CategoryInitial
+  - CategoryLoading
+  - CategoriesLoaded (with helper methods: incomeCategories, expenseCategories, defaultCategories, customCategories)
+  - CategoryLoaded
+  - CategoryActionSuccess(message)
+  - DefaultCategoriesLoaded(categories)
+  - CategoryError(message)
+
+- `lib/features/categories/presentation/bloc/category_bloc.dart` (~180 lines)
+  - Handles all 7 event types
+  - Event handlers: _onLoadCategories, _onLoadCategoryById, _onCreate, _onUpdate, _onDelete, _onLoadDefaults, _onInitializeDefaults
+  - Proper error handling with fold
+  - Success messages for user feedback
+  - Dependencies: 7 use cases injected
+
+- `lib/features/categories/presentation/pages/category_list_page.dart` (~400 lines)
+  - Summary card showing:
+    - Total categories count
+    - Income categories count
+    - Expense categories count
+    - Custom categories count
+  - Categories grouped by type with section headers
+  - Differentiates default (lock icon) vs custom (editable) categories
+  - Swipe-to-delete for custom categories
+  - Delete confirmation dialog
+  - Info button with dialog explaining category rules
+  - Loading/error/empty states
+  - BlocBuilder with CategoryBloc
+  - FAB to add new category
+  - Navigation to CategoryFormPage
+
+- `lib/features/categories/presentation/pages/category_form_page.dart` (~400 lines)
+  - Create/Edit mode with single page
+  - Blocks editing of default categories (read-only mode)
+  - Type selector (Income/Expense) - only for new categories
+  - Name text field with validation
+  - Icon picker:
+    - 8 income icons: work, computer, business_center, trending_up, home, card_giftcard, star, receipt
+    - 12 expense icons: restaurant, shopping_cart, directions_car, shopping_bag, movie, receipt_long, local_hospital, school, flight, spa, security, subscriptions
+  - Color picker with 10 colors
+  - Form validation:
+    - Name required, 1-50 chars
+    - Icon required
+    - Color required
+  - Save/Cancel buttons
+  - BlocListener for success/error
+
+- `lib/features/categories/presentation/widgets/category_chip.dart` (~100 lines)
+  - Reusable chip widget
+  - Shows icon, name, color
+  - Selection state support
+  - Tap callback
+  - Color parsing from hex string
+  - Icon mapping from string to IconData
+  - Used in category list and transaction forms
+
+**UI Features:**
+- Summary statistics card
+- Grouped list view (Income vs Expense)
+- Visual distinction (default = lock icon, custom = editable)
+- Icon and color customization
+- Form validation with error messages
+- Confirmation dialogs
+- Info dialogs
+- Loading states with shimmer
+- Error states with retry
+- Empty states
+
+#### 4. Infrastructure ✅
+**Files Updated:**
+- `lib/core/di/injection_container.dart`
+  - Registered CategoryRemoteDataSource (mock)
+  - Registered CategoryLocalDataSource (Hive)
+  - Registered CategoryRepository
+  - Registered 7 use cases
+  - Registered CategoryBloc as factory
+  - All dependencies properly wired
+
+- `lib/app/router/app_router.dart`
+  - Added CategoryListPage import
+  - Updated /categories route to use CategoryListPage
+  - Passes userId='user_1' (TODO: Get from auth state)
+  - Sub-routes: /categories/add, /categories/:id/edit
+
+#### 5. Code Generation ✅
+**Commands Run:**
+```bash
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+**Generated Files:**
+- `category_model.g.dart` - JSON serialization code
+
+**Warnings Resolved:**
+- Updated json_annotation version constraint
+- Analyzer version mismatch noted (non-blocking)
+
+### What Works Right Now
+
+#### Category Management
+- ✅ View all categories grouped by type (Income/Expense)
+- ✅ 25 default categories available immediately for 'user_1'
+- ✅ Create custom categories with icon and color selection
+- ✅ Edit custom categories (name, icon, color)
+- ✅ Delete custom categories with confirmation dialog
+- ✅ Default categories protected from modification (read-only)
+
+#### UI Features
+- ✅ Category summary card with counts
+- ✅ Section headers for Income/Expense groups
+- ✅ Lock icons for default categories
+- ✅ Edit/Delete icons for custom categories
+- ✅ Info dialog explaining category rules
+- ✅ Icon picker with 20 icons
+- ✅ Color picker with 10 colors
+- ✅ Form validation with error messages
+- ✅ Loading states with shimmer effect
+- ✅ Error states with retry button
+- ✅ Empty state for no categories
+
+#### Data Management
+- ✅ Offline support with Hive caching
+- ✅ Cache-first strategy with remote fallback
+- ✅ Automatic initialization of default categories
+- ✅ Validation prevents duplicate names
+- ✅ Cannot edit/delete default categories
+- ✅ Simulated network delays for realistic behavior
+
+### Testing Completed
+- ✅ App runs without errors in Chrome
+- ✅ Login flow works (test@example.com)
+- ✅ Navigate to /categories page
+- ✅ Default categories load automatically
+- ✅ BLoC transitions logged correctly
+- ✅ No compilation errors (77 info warnings only - deprecations, linting)
+
+### Technical Achievements
+- ✅ Clean Architecture maintained across all layers
+- ✅ BLoC pattern for state management
+- ✅ Functional error handling with Either monad
+- ✅ Offline-first with Hive
+- ✅ JSON serialization with code generation
+- ✅ Reusable widgets (CategoryChip)
+- ✅ Form validation
+- ✅ Responsive UI with loading/error/empty states
+- ✅ Code generation for JSON serialization
+- ✅ Zero compilation errors
+
+**Files Created:** 18+ files (~2,800 lines of code)
+**Mock Data:** 25 default categories for 'user_1'
+
+**Ready for:** Phase 4 - Transactions
+
 ### 📋 Upcoming Phases
 
-- **Phase 2:** Account Management (Week 3)
-- **Phase 3:** Categories (Week 3)
 - **Phase 4:** Transactions (Week 4-5) - CRITICAL
 - **Phase 5:** Dashboard (Week 5)
 - **Phase 6:** Budget Tracking (Week 6)
@@ -1158,6 +1549,6 @@ See `.claude/plans/jolly-riding-badger.md` for complete 12-week implementation p
 
 **Last Updated:** 2025-12-13
 **Claude Version Used:** Claude Sonnet 4.5
-**Implementation Status:** Phase 1 - Foundation (COMPLETE ✅ - 100%)
-**Current Focus:** Ready to begin Phase 2 - Account Management
-**Next Tasks:** Account CRUD operations, multi-currency support, account types
+**Implementation Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅)
+**Current Focus:** Ready for Phase 4 - Transactions
+**Next Tasks:** Transaction entity, CRUD operations, account balance updates, filtering/search
