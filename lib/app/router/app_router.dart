@@ -53,7 +53,10 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.dashboard,
           name: RouteNames.dashboard,
-          builder: (context, state) => const _DashboardPlaceholder(),
+          builder: (context, state) => const _PlaceholderPage(
+            title: 'Dashboard',
+            description: 'Dashboard will show summary cards, charts, and recent transactions',
+          ),
         ),
 
         // ==================== Transactions ====================
