@@ -21,6 +21,20 @@ import '../../features/auth/domain/usecases/send_password_reset_email.dart';
 import '../../features/auth/domain/usecases/update_profile.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 
+// Accounts
+import '../../features/accounts/data/datasources/account_local_datasource.dart';
+import '../../features/accounts/data/datasources/account_local_datasource_impl.dart';
+import '../../features/accounts/data/datasources/account_remote_datasource.dart';
+import '../../features/accounts/data/datasources/account_remote_datasource_mock.dart';
+import '../../features/accounts/data/repositories/account_repository_impl.dart';
+import '../../features/accounts/domain/repositories/account_repository.dart';
+import '../../features/accounts/domain/usecases/create_account.dart';
+import '../../features/accounts/domain/usecases/delete_account.dart';
+import '../../features/accounts/domain/usecases/get_account_by_id.dart';
+import '../../features/accounts/domain/usecases/get_accounts.dart';
+import '../../features/accounts/domain/usecases/update_account.dart';
+import '../../features/accounts/presentation/bloc/account_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -157,40 +171,39 @@ Future<void> initializeDependencies() async {
   // ==================== Accounts Feature ====================
 
   // Data Sources
-  // sl.registerLazySingleton<AccountRemoteDataSource>(
-  //   () => AccountRemoteDataSourceMock(),
-  // );
+  sl.registerLazySingleton<AccountRemoteDataSource>(
+    () => AccountRemoteDataSourceMock(), // Mock implementation initially
+  );
 
-  // sl.registerLazySingleton<AccountLocalDataSource>(
-  //   () => AccountLocalDataSourceImpl(database: sl()),
-  // );
+  sl.registerLazySingleton<AccountLocalDataSource>(
+    () => AccountLocalDataSourceImpl(hive: sl()),
+  );
 
   // Repositories
-  // sl.registerLazySingleton<AccountRepository>(
-  //   () => AccountRepositoryImpl(
-  //     remoteDataSource: sl(),
-  //     localDataSource: sl(),
-  //     networkInfo: sl(),
-  //   ),
-  // );
+  sl.registerLazySingleton<AccountRepository>(
+    () => AccountRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
 
   // Use Cases
-  // sl.registerLazySingleton(() => GetAccounts(repository: sl()));
-  // sl.registerLazySingleton(() => GetAccountById(repository: sl()));
-  // sl.registerLazySingleton(() => CreateAccount(repository: sl()));
-  // sl.registerLazySingleton(() => UpdateAccount(repository: sl()));
-  // sl.registerLazySingleton(() => DeleteAccount(repository: sl()));
+  sl.registerLazySingleton(() => GetAccounts(repository: sl()));
+  sl.registerLazySingleton(() => GetAccountById(repository: sl()));
+  sl.registerLazySingleton(() => CreateAccount(repository: sl()));
+  sl.registerLazySingleton(() => UpdateAccount(repository: sl()));
+  sl.registerLazySingleton(() => DeleteAccount(repository: sl()));
 
   // BLoC
-  // sl.registerFactory(
-  //   () => AccountBloc(
-  //     getAccounts: sl(),
-  //     getAccountById: sl(),
-  //     createAccount: sl(),
-  //     updateAccount: sl(),
-  //     deleteAccount: sl(),
-  //   ),
-  // );
+  sl.registerFactory(
+    () => AccountBloc(
+      getAccounts: sl(),
+      getAccountById: sl(),
+      createAccount: sl(),
+      updateAccount: sl(),
+      deleteAccount: sl(),
+    ),
+  );
 
   // ==================== Categories Feature ====================
 
