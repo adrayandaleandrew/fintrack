@@ -21,6 +21,35 @@ import '../../features/auth/domain/usecases/send_password_reset_email.dart';
 import '../../features/auth/domain/usecases/update_profile.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 
+// Accounts - TODO: Implement in Phase 2
+// import '../../features/accounts/data/datasources/account_local_datasource.dart';
+// import '../../features/accounts/data/datasources/account_local_datasource_impl.dart';
+// import '../../features/accounts/data/datasources/account_remote_datasource.dart';
+// import '../../features/accounts/data/datasources/account_remote_datasource_mock.dart';
+// import '../../features/accounts/data/repositories/account_repository_impl.dart';
+// import '../../features/accounts/domain/repositories/account_repository.dart';
+// import '../../features/accounts/domain/usecases/create_account.dart';
+// import '../../features/accounts/domain/usecases/delete_account.dart';
+// import '../../features/accounts/domain/usecases/get_account_by_id.dart';
+// import '../../features/accounts/domain/usecases/get_accounts.dart';
+// import '../../features/accounts/domain/usecases/update_account.dart';
+// import '../../features/accounts/presentation/bloc/account_bloc.dart';
+
+// Categories
+import '../../features/categories/data/datasources/category_local_datasource.dart';
+import '../../features/categories/data/datasources/category_local_datasource_impl.dart';
+import '../../features/categories/data/datasources/category_remote_datasource.dart';
+import '../../features/categories/data/datasources/category_remote_datasource_mock.dart';
+import '../../features/categories/data/repositories/category_repository_impl.dart';
+import '../../features/categories/domain/repositories/category_repository.dart';
+import '../../features/categories/domain/usecases/create_category.dart';
+import '../../features/categories/domain/usecases/delete_category.dart';
+import '../../features/categories/domain/usecases/get_categories.dart';
+import '../../features/categories/domain/usecases/get_category_by_id.dart';
+import '../../features/categories/domain/usecases/get_default_categories.dart';
+import '../../features/categories/domain/usecases/initialize_default_categories.dart';
+import '../../features/categories/domain/usecases/update_category.dart';
+import '../../features/categories/presentation/bloc/category_bloc.dart';
 // Accounts
 import '../../features/accounts/data/datasources/account_local_datasource.dart';
 import '../../features/accounts/data/datasources/account_local_datasource_impl.dart';
@@ -169,8 +198,24 @@ Future<void> initializeDependencies() async {
   );
 
   // ==================== Accounts Feature ====================
+  // TODO: Implement in Phase 2
 
   // Data Sources
+  // sl.registerLazySingleton<AccountRemoteDataSource>(
+  //   () => AccountRemoteDataSourceMock(), // Mock implementation initially
+  // );
+
+  // sl.registerLazySingleton<AccountLocalDataSource>(
+  //   () => AccountLocalDataSourceImpl(hive: sl()),
+  // );
+
+  // Repositories
+  // sl.registerLazySingleton<AccountRepository>(
+  //   () => AccountRepositoryImpl(
+  //     remoteDataSource: sl(),
+  //     localDataSource: sl(),
+  //   ),
+  // );
   sl.registerLazySingleton<AccountRemoteDataSource>(
     () => AccountRemoteDataSourceMock(), // Mock implementation initially
   );
@@ -208,42 +253,43 @@ Future<void> initializeDependencies() async {
   // ==================== Categories Feature ====================
 
   // Data Sources
-  // sl.registerLazySingleton<CategoryRemoteDataSource>(
-  //   () => CategoryRemoteDataSourceMock(),
-  // );
+  sl.registerLazySingleton<CategoryRemoteDataSource>(
+    () => CategoryRemoteDataSourceMock(), // Mock implementation initially
+  );
 
-  // sl.registerLazySingleton<CategoryLocalDataSource>(
-  //   () => CategoryLocalDataSourceImpl(database: sl()),
-  // );
+  sl.registerLazySingleton<CategoryLocalDataSource>(
+    () => CategoryLocalDataSourceImpl(hive: sl()),
+  );
 
   // Repositories
-  // sl.registerLazySingleton<CategoryRepository>(
-  //   () => CategoryRepositoryImpl(
-  //     remoteDataSource: sl(),
-  //     localDataSource: sl(),
-  //     networkInfo: sl(),
-  //   ),
-  // );
+  sl.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
 
   // Use Cases
-  // sl.registerLazySingleton(() => GetCategories(repository: sl()));
-  // sl.registerLazySingleton(() => GetCategoryById(repository: sl()));
-  // sl.registerLazySingleton(() => CreateCategory(repository: sl()));
-  // sl.registerLazySingleton(() => UpdateCategory(repository: sl()));
-  // sl.registerLazySingleton(() => DeleteCategory(repository: sl()));
-  // sl.registerLazySingleton(() => GetDefaultCategories(repository: sl()));
+  sl.registerLazySingleton(() => GetCategories(repository: sl()));
+  sl.registerLazySingleton(() => GetCategoryById(repository: sl()));
+  sl.registerLazySingleton(() => CreateCategory(repository: sl()));
+  sl.registerLazySingleton(() => UpdateCategory(repository: sl()));
+  sl.registerLazySingleton(() => DeleteCategory(repository: sl()));
+  sl.registerLazySingleton(() => GetDefaultCategories(repository: sl()));
+  sl.registerLazySingleton(() => InitializeDefaultCategories(repository: sl()));
 
   // BLoC
-  // sl.registerFactory(
-  //   () => CategoryBloc(
-  //     getCategories: sl(),
-  //     getCategoryById: sl(),
-  //     createCategory: sl(),
-  //     updateCategory: sl(),
-  //     deleteCategory: sl(),
-  //     getDefaultCategories: sl(),
-  //   ),
-  // );
+  sl.registerFactory(
+    () => CategoryBloc(
+      getCategories: sl(),
+      getCategoryById: sl(),
+      createCategory: sl(),
+      updateCategory: sl(),
+      deleteCategory: sl(),
+      getDefaultCategories: sl(),
+      initializeDefaultCategories: sl(),
+    ),
+  );
 
   // ==================== Transactions Feature ====================
 
