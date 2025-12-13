@@ -80,6 +80,10 @@ import '../../features/transactions/domain/usecases/search_transactions.dart';
 import '../../features/transactions/domain/usecases/update_transaction.dart';
 import '../../features/transactions/presentation/bloc/transaction_bloc.dart';
 
+// Dashboard
+import '../../features/dashboard/domain/usecases/get_dashboard_summary.dart';
+import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -497,18 +501,19 @@ Future<void> initializeDependencies() async {
   // ==================== Dashboard Feature ====================
 
   // Use Cases
-  // sl.registerLazySingleton(() => GetDashboardSummary(
-  //   accountRepository: sl(),
-  //   transactionRepository: sl(),
-  //   budgetRepository: sl(),
-  // ));
+  sl.registerLazySingleton(
+    () => GetDashboardSummary(
+      accountRepository: sl(),
+      transactionRepository: sl(),
+    ),
+  );
 
   // BLoC
-  // sl.registerFactory(
-  //   () => DashboardBloc(
-  //     getDashboardSummary: sl(),
-  //   ),
-  // );
+  sl.registerFactory(
+    () => DashboardBloc(
+      getDashboardSummary: sl(),
+    ),
+  );
 }
 
 /// Resets all registered dependencies
