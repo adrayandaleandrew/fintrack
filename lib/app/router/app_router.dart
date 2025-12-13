@@ -4,6 +4,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
 import '../../features/categories/presentation/pages/category_list_page.dart';
+import '../../features/accounts/presentation/pages/account_list_page.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
@@ -52,10 +53,7 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.dashboard,
           name: RouteNames.dashboard,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Dashboard',
-            description: 'Dashboard will show summary cards, charts, and recent transactions',
-          ),
+          builder: (context, state) => const _DashboardPlaceholder(),
         ),
 
         // ==================== Transactions ====================
@@ -104,9 +102,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.accounts,
           name: RouteNames.accounts,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Accounts',
-            description: 'List of all accounts',
+          builder: (context, state) => const AccountListPage(
+            userId: 'user_1', // TODO: Get from auth state
           ),
           routes: [
             GoRoute(

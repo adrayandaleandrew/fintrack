@@ -50,6 +50,19 @@ import '../../features/categories/domain/usecases/get_default_categories.dart';
 import '../../features/categories/domain/usecases/initialize_default_categories.dart';
 import '../../features/categories/domain/usecases/update_category.dart';
 import '../../features/categories/presentation/bloc/category_bloc.dart';
+// Accounts
+import '../../features/accounts/data/datasources/account_local_datasource.dart';
+import '../../features/accounts/data/datasources/account_local_datasource_impl.dart';
+import '../../features/accounts/data/datasources/account_remote_datasource.dart';
+import '../../features/accounts/data/datasources/account_remote_datasource_mock.dart';
+import '../../features/accounts/data/repositories/account_repository_impl.dart';
+import '../../features/accounts/domain/repositories/account_repository.dart';
+import '../../features/accounts/domain/usecases/create_account.dart';
+import '../../features/accounts/domain/usecases/delete_account.dart';
+import '../../features/accounts/domain/usecases/get_account_by_id.dart';
+import '../../features/accounts/domain/usecases/get_accounts.dart';
+import '../../features/accounts/domain/usecases/update_account.dart';
+import '../../features/accounts/presentation/bloc/account_bloc.dart';
 
 /// Service locator instance
 ///
@@ -203,24 +216,39 @@ Future<void> initializeDependencies() async {
   //     localDataSource: sl(),
   //   ),
   // );
+  sl.registerLazySingleton<AccountRemoteDataSource>(
+    () => AccountRemoteDataSourceMock(), // Mock implementation initially
+  );
+
+  sl.registerLazySingleton<AccountLocalDataSource>(
+    () => AccountLocalDataSourceImpl(hive: sl()),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<AccountRepository>(
+    () => AccountRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
 
   // Use Cases
-  // sl.registerLazySingleton(() => GetAccounts(repository: sl()));
-  // sl.registerLazySingleton(() => GetAccountById(repository: sl()));
-  // sl.registerLazySingleton(() => CreateAccount(repository: sl()));
-  // sl.registerLazySingleton(() => UpdateAccount(repository: sl()));
-  // sl.registerLazySingleton(() => DeleteAccount(repository: sl()));
+  sl.registerLazySingleton(() => GetAccounts(repository: sl()));
+  sl.registerLazySingleton(() => GetAccountById(repository: sl()));
+  sl.registerLazySingleton(() => CreateAccount(repository: sl()));
+  sl.registerLazySingleton(() => UpdateAccount(repository: sl()));
+  sl.registerLazySingleton(() => DeleteAccount(repository: sl()));
 
   // BLoC
-  // sl.registerFactory(
-  //   () => AccountBloc(
-  //     getAccounts: sl(),
-  //     getAccountById: sl(),
-  //     createAccount: sl(),
-  //     updateAccount: sl(),
-  //     deleteAccount: sl(),
-  //   ),
-  // );
+  sl.registerFactory(
+    () => AccountBloc(
+      getAccounts: sl(),
+      getAccountById: sl(),
+      createAccount: sl(),
+      updateAccount: sl(),
+      deleteAccount: sl(),
+    ),
+  );
 
   // ==================== Categories Feature ====================
 
