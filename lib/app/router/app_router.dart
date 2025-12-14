@@ -12,6 +12,8 @@ import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/budgets/presentation/pages/budget_list_page.dart';
 import '../../features/budgets/presentation/pages/budget_form_page.dart';
 import '../../features/budgets/presentation/pages/budget_detail_page.dart';
+import '../../features/recurring_transactions/presentation/pages/recurring_transaction_list_page.dart';
+import '../../features/recurring_transactions/presentation/pages/recurring_transaction_form_page.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
@@ -208,18 +210,14 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.recurringTransactions,
           name: RouteNames.recurringTransactions,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Recurring Transactions',
-            description: 'List of all recurring transactions',
+          builder: (context, state) => const RecurringTransactionListPage(
+            userId: 'user_1', // TODO: Get from auth state
           ),
           routes: [
             GoRoute(
               path: 'add',
               name: RouteNames.addRecurringTransaction,
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Add Recurring Transaction',
-                description: 'Form to add new recurring transaction',
-              ),
+              builder: (context, state) => const RecurringTransactionFormPage(),
             ),
             GoRoute(
               path: ':id',
@@ -237,9 +235,8 @@ class AppRouter {
               name: RouteNames.editRecurringTransaction,
               builder: (context, state) {
                 final id = state.pathParameters['id']!;
-                return _PlaceholderPage(
-                  title: 'Edit Recurring Transaction',
-                  description: 'Edit recurring transaction $id',
+                return RecurringTransactionFormPage(
+                  recurringTransactionId: id,
                 );
               },
             ),

@@ -96,6 +96,18 @@ import '../../features/budgets/domain/usecases/delete_budget.dart';
 import '../../features/budgets/domain/usecases/calculate_budget_usage.dart';
 import '../../features/budgets/presentation/bloc/budget_bloc.dart';
 
+// Recurring Transactions
+import '../../features/recurring_transactions/data/datasources/recurring_transaction_remote_datasource.dart';
+import '../../features/recurring_transactions/data/datasources/recurring_transaction_remote_datasource_mock.dart';
+import '../../features/recurring_transactions/data/repositories/recurring_transaction_repository_impl.dart';
+import '../../features/recurring_transactions/domain/repositories/recurring_transaction_repository.dart';
+import '../../features/recurring_transactions/domain/usecases/get_recurring_transactions.dart';
+import '../../features/recurring_transactions/domain/usecases/create_recurring_transaction.dart';
+import '../../features/recurring_transactions/domain/usecases/update_recurring_transaction.dart';
+import '../../features/recurring_transactions/domain/usecases/delete_recurring_transaction.dart';
+import '../../features/recurring_transactions/domain/usecases/process_due_recurring_transactions.dart';
+import '../../features/recurring_transactions/presentation/bloc/recurring_transaction_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -409,40 +421,49 @@ Future<void> initializeDependencies() async {
   // ==================== Recurring Transactions Feature ====================
 
   // Data Sources
-  // sl.registerLazySingleton<RecurringTransactionRemoteDataSource>(
-  //   () => RecurringTransactionRemoteDataSourceMock(),
-  // );
-
-  // sl.registerLazySingleton<RecurringTransactionLocalDataSource>(
-  //   () => RecurringTransactionLocalDataSourceImpl(database: sl()),
-  // );
+  sl.registerLazySingleton<RecurringTransactionRemoteDataSource>(
+    () => RecurringTransactionRemoteDataSourceMock(),
+  );
 
   // Repositories
-  // sl.registerLazySingleton<RecurringTransactionRepository>(
-  //   () => RecurringTransactionRepositoryImpl(
-  //     remoteDataSource: sl(),
-  //     localDataSource: sl(),
-  //     networkInfo: sl(),
-  //   ),
-  // );
+  sl.registerLazySingleton<RecurringTransactionRepository>(
+    () => RecurringTransactionRepositoryImpl(
+      remoteDataSource: sl(),
+      transactionRepository: sl(),
+    ),
+  );
 
   // Use Cases
-  // sl.registerLazySingleton(() => GetRecurringTransactions(repository: sl()));
-  // sl.registerLazySingleton(() => CreateRecurringTransaction(repository: sl()));
-  // sl.registerLazySingleton(() => UpdateRecurringTransaction(repository: sl()));
-  // sl.registerLazySingleton(() => DeleteRecurringTransaction(repository: sl()));
-  // sl.registerLazySingleton(() => ProcessRecurringTransactions(repository: sl()));
+  sl.registerLazySingleton(
+    () => GetRecurringTransactions(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => CreateRecurringTransaction(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => UpdateRecurringTransaction(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => DeleteRecurringTransaction(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => ProcessDueRecurringTransactions(sl()),
+  );
 
   // BLoC
-  // sl.registerFactory(
-  //   () => RecurringTransactionBloc(
-  //     getRecurringTransactions: sl(),
-  //     createRecurringTransaction: sl(),
-  //     updateRecurringTransaction: sl(),
-  //     deleteRecurringTransaction: sl(),
-  //     processRecurringTransactions: sl(),
-  //   ),
-  // );
+  sl.registerFactory(
+    () => RecurringTransactionBloc(
+      getRecurringTransactions: sl(),
+      createRecurringTransaction: sl(),
+      updateRecurringTransaction: sl(),
+      deleteRecurringTransaction: sl(),
+      processDueRecurringTransactions: sl(),
+    ),
+  );
 
   // ==================== Reports Feature ====================
 
