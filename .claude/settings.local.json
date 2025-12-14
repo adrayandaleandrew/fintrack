@@ -9,7 +9,8 @@
       "Bash(flutter doctor:*)",
       "Bash(flutter run:*)",
       "Bash(flutter devices:*)",
-      "Bash(flutter create:*)"
+      "Bash(flutter create:*)",
+      "Bash(flutter build:*)"
     ]
   }
 }
