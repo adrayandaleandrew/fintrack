@@ -108,6 +108,14 @@ import '../../features/recurring_transactions/domain/usecases/delete_recurring_t
 import '../../features/recurring_transactions/domain/usecases/process_due_recurring_transactions.dart';
 import '../../features/recurring_transactions/presentation/bloc/recurring_transaction_bloc.dart';
 
+// Reports
+import '../../features/reports/data/repositories/reports_repository_impl.dart';
+import '../../features/reports/domain/repositories/reports_repository.dart';
+import '../../features/reports/domain/usecases/get_expense_breakdown.dart';
+import '../../features/reports/domain/usecases/get_financial_trends.dart';
+import '../../features/reports/domain/usecases/get_monthly_comparison.dart';
+import '../../features/reports/presentation/bloc/reports_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -592,6 +600,38 @@ Future<void> initializeDependencies() async {
       updateBudget: sl(),
       deleteBudget: sl(),
       calculateBudgetUsage: sl(),
+    ),
+  );
+
+  // ==================== Reports Feature ====================
+
+  // Repositories
+  sl.registerLazySingleton<ReportsRepository>(
+    () => ReportsRepositoryImpl(
+      transactionRepository: sl(),
+      categoryRepository: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(
+    () => GetExpenseBreakdown(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => GetFinancialTrends(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => GetMonthlyComparison(sl()),
+  );
+
+  // BLoC
+  sl.registerFactory(
+    () => ReportsBloc(
+      getExpenseBreakdown: sl(),
+      getFinancialTrends: sl(),
+      getMonthlyComparison: sl(),
     ),
   );
 }
