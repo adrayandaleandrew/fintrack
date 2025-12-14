@@ -704,8 +704,88 @@ Closes #45
 
 **Mock Data:** 4 sample recurring transactions (Monthly salary income, Weekly groceries expense, Monthly rent expense, Quarterly insurance - inactive)
 
+### ✅ Phase 8: Reports & Analytics (COMPLETE - 100%)
+
+**Completed Features:**
+- ✅ Complete Clean Architecture implementation (Domain, Data, Presentation)
+- ✅ Expense breakdown by category with pie chart visualization
+- ✅ Financial trends (income vs expense) with line chart
+- ✅ Monthly comparison with grouped bar chart
+- ✅ Date range filtering for all reports
+- ✅ Real-time report calculation from transaction data
+- ✅ Interactive charts with tooltips and legends
+- ✅ Tabbed interface for different report types
+
+**✅ Domain Layer (100%)**
+- Report entities: CategoryExpense, ExpenseBreakdown, TrendDataPoint, FinancialTrends, MonthlyComparisonData, MonthlyComparison
+- ReportsRepository interface with 4 methods
+- 3 use cases implemented:
+  - GetExpenseBreakdown - Calculate expenses grouped by category with percentages
+  - GetFinancialTrends - Calculate income/expense trends over time with grouping (day/week/month)
+  - GetMonthlyComparison - Calculate monthly financial data for comparison
+- Validation: date ranges, groupBy parameter, month count limits
+
+**✅ Data Layer (100%)**
+- ReportsRepositoryImpl integrates with TransactionRepository and CategoryRepository
+- Report calculation logic:
+  - Expense breakdown: Group transactions by category, calculate percentages
+  - Financial trends: Group transactions by period (day/week/month), sum income/expense
+  - Monthly comparison: Group last N months, calculate totals and averages
+- No separate data sources needed (reports calculated on-the-fly from transactions)
+- Handles empty data gracefully with appropriate empty states
+
+**✅ Presentation Layer (100%)**
+- ReportsBloc with 4 events and 7 states
+- ReportsPage with tabbed interface (3 tabs: Breakdown, Trends, Comparison)
+- 3 chart widgets using fl_chart package:
+  - ExpenseBreakdownChart - Interactive pie chart with touch effects
+  - FinancialTrendsChart - Dual-line chart with income (green) and expense (red) lines
+  - MonthlyComparisonChart - Grouped bar chart comparing income vs expense
+- Features:
+  - Date range picker for custom periods
+  - Chart legends with color coding
+  - Summary cards showing totals and averages
+  - Empty states with helpful messages
+  - Loading states with progress indicators
+  - Error handling with user-friendly messages
+- Dependency injection fully wired up
+- Router updated with Reports page
+
+**What Works Right Now:**
+- 🎯 View expense breakdown pie chart grouped by category
+- 🎯 See percentage of total spending for each category
+- 🎯 View income vs expense trends over time
+- 🎯 Compare monthly financial data with bar chart
+- 🎯 Filter all reports by custom date range
+- 🎯 Interactive charts with touch/hover tooltips
+- 🎯 Real-time calculation from transaction data
+- 🎯 Summary statistics for each report type
+- 🎯 Tab navigation between different report types
+- 🎯 Responsive charts that adapt to screen size
+
+**Technical Achievements:**
+- ✅ Integration with TransactionRepository and CategoryRepository for data
+- ✅ On-the-fly report calculation (no separate data storage needed)
+- ✅ Grouping logic for different time periods (day, week, month)
+- ✅ Percentage calculations for expense breakdown
+- ✅ Trend analysis with data point generation
+- ✅ Monthly comparison with date range handling
+- ✅ Chart customization with fl_chart package:
+  - Pie charts with touch interaction
+  - Line charts with dual lines and area fills
+  - Bar charts with grouped bars
+  - Tooltips, legends, and axis labels
+- ✅ Compact number formatting for chart axes (1.2K, 3.5M)
+- ✅ Color-coded visualizations (green=income, red=expense)
+
+**Files Created:** 15+ files (~1,800 lines of code)
+- Domain: 6 entities, 1 repository interface, 3 use cases
+- Data: 1 repository implementation
+- Presentation: 3 BLoC files, 1 page, 3 chart widgets
+- Infrastructure: 1 DI update, 1 router update
+- Utils: 1 helper method added to CurrencyFormatter
+
 ### 📋 Next Phases:
-- **Phase 8:** Reports & Analytics (charts, trends, insights)
 - **Phase 9:** Multi-Currency (exchange rates, conversion)
 - **Phase 10:** Polish & Optimization (performance, dark mode, onboarding)
 
@@ -745,4 +825,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Last Updated:** 2025-12-14
 **Version:** 1.0.0
-**Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (COMPLETE ✅) | Phase 5 - Dashboard (COMPLETE ✅) | Phase 6 - Budgets (COMPLETE ✅) | Phase 7 - Recurring Transactions (COMPLETE ✅)
+**Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (COMPLETE ✅) | Phase 5 - Dashboard (COMPLETE ✅) | Phase 6 - Budgets (COMPLETE ✅) | Phase 7 - Recurring Transactions (COMPLETE ✅) | Phase 8 - Reports & Analytics (COMPLETE ✅)
