@@ -9,6 +9,9 @@ import '../../features/transactions/presentation/pages/transaction_list_page.dar
 import '../../features/transactions/presentation/pages/transaction_form_page.dart';
 import '../../features/transactions/presentation/pages/transaction_detail_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../../features/budgets/presentation/pages/budget_list_page.dart';
+import '../../features/budgets/presentation/pages/budget_form_page.dart';
+import '../../features/budgets/presentation/pages/budget_detail_page.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
@@ -170,28 +173,21 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.budgets,
           name: RouteNames.budgets,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Budgets',
-            description: 'List of all budgets with progress',
+          builder: (context, state) => const BudgetListPage(
+            userId: 'user_1', // TODO: Get from auth state
           ),
           routes: [
             GoRoute(
               path: 'add',
               name: RouteNames.addBudget,
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Add Budget',
-                description: 'Form to add new budget',
-              ),
+              builder: (context, state) => const BudgetFormPage(),
             ),
             GoRoute(
               path: ':id',
               name: RouteNames.budgetDetail,
               builder: (context, state) {
                 final id = state.pathParameters['id']!;
-                return _PlaceholderPage(
-                  title: 'Budget Detail',
-                  description: 'Details for budget $id',
-                );
+                return BudgetDetailPage(budgetId: id);
               },
             ),
             GoRoute(

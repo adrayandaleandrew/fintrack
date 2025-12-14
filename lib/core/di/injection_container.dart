@@ -84,6 +84,18 @@ import '../../features/transactions/presentation/bloc/transaction_bloc.dart';
 import '../../features/dashboard/domain/usecases/get_dashboard_summary.dart';
 import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart';
 
+// Budgets
+import '../../features/budgets/data/datasources/budget_remote_datasource.dart';
+import '../../features/budgets/data/datasources/budget_remote_datasource_mock.dart';
+import '../../features/budgets/data/repositories/budget_repository_impl.dart';
+import '../../features/budgets/domain/repositories/budget_repository.dart';
+import '../../features/budgets/domain/usecases/get_budgets.dart';
+import '../../features/budgets/domain/usecases/create_budget.dart';
+import '../../features/budgets/domain/usecases/update_budget.dart';
+import '../../features/budgets/domain/usecases/delete_budget.dart';
+import '../../features/budgets/domain/usecases/calculate_budget_usage.dart';
+import '../../features/budgets/presentation/bloc/budget_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -512,6 +524,53 @@ Future<void> initializeDependencies() async {
   sl.registerFactory(
     () => DashboardBloc(
       getDashboardSummary: sl(),
+    ),
+  );
+
+  // ==================== Budget Feature ====================
+
+  // Data Sources
+  sl.registerLazySingleton<BudgetRemoteDataSource>(
+    () => BudgetRemoteDataSourceMock(),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<BudgetRepository>(
+    () => BudgetRepositoryImpl(
+      remoteDataSource: sl(),
+      transactionRepository: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(
+    () => GetBudgets(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => CreateBudget(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => UpdateBudget(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => DeleteBudget(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => CalculateBudgetUsage(sl()),
+  );
+
+  // BLoC
+  sl.registerFactory(
+    () => BudgetBloc(
+      getBudgets: sl(),
+      createBudget: sl(),
+      updateBudget: sl(),
+      deleteBudget: sl(),
+      calculateBudgetUsage: sl(),
     ),
   );
 }
