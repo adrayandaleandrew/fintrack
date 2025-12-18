@@ -4,6 +4,7 @@ import 'app/router/app_router.dart';
 import 'app/theme/app_theme.dart';
 import 'core/di/injection_container.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/currency/presentation/bloc/currency_bloc.dart';
 
 /// Application entry point
 ///
@@ -36,6 +37,11 @@ class FinanceTrackerApp extends StatelessWidget {
         // Provide AuthBloc at app level
         BlocProvider<AuthBloc>(
           create: (context) => sl<AuthBloc>(),
+        ),
+
+        // Currency BLoC for multi-currency support
+        BlocProvider<CurrencyBloc>(
+          create: (context) => sl<CurrencyBloc>(),
         ),
 
         // Additional BLoCs will be added here as features are implemented

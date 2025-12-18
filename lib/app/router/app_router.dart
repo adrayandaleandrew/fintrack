@@ -15,6 +15,7 @@ import '../../features/budgets/presentation/pages/budget_detail_page.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_list_page.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_form_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
+import '../../features/currency/presentation/pages/settings_page.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
@@ -257,9 +258,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.settings,
           name: RouteNames.settings,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Settings',
-            description: 'App settings and preferences',
+          builder: (context, state) => const SettingsPage(
+            userId: 'user_1', // TODO: Get from auth state
           ),
           routes: [
             GoRoute(

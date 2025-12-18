@@ -74,7 +74,7 @@ class CurrencyFormatter {
   /// Formats amount as a compact number without currency symbol (e.g., "1.2K", "3.5M").
   ///
   /// Useful for chart axis labels and displaying numbers in limited space.
-  static String formatCompact(double amount) {
+  static String formatCompactNumber(double amount) {
     if (amount >= 1000000) {
       return '${(amount / 1000000).toStringAsFixed(1)}M';
     } else if (amount >= 1000) {

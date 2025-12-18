@@ -80,7 +80,7 @@ class MonthlyComparisonChart extends StatelessWidget {
                     interval: _calculateVerticalInterval(),
                     getTitlesWidget: (value, meta) {
                       return Text(
-                        CurrencyFormatter.formatCompact(value),
+                        CurrencyFormatter.formatCompactNumber(value),
                         style: const TextStyle(fontSize: 10),
                       );
                     },

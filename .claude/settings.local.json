@@ -10,7 +10,11 @@
       "Bash(flutter run:*)",
       "Bash(flutter devices:*)",
       "Bash(flutter create:*)",
-      "Bash(flutter build:*)"
+      "Bash(flutter build:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

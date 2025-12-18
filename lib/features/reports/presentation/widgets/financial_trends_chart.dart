@@ -73,7 +73,7 @@ class FinancialTrendsChart extends StatelessWidget {
                     interval: _calculateHorizontalInterval(),
                     getTitlesWidget: (value, meta) {
                       return Text(
-                        CurrencyFormatter.formatCompact(value),
+                        CurrencyFormatter.formatCompactNumber(value),
                         style: const TextStyle(fontSize: 10),
                       );
                     },
