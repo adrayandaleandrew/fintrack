@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../app/router/route_paths.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
@@ -21,8 +22,23 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    // Check auth status on page load
-    context.read<AuthBloc>().add(const CheckAuthStatus());
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    // Check if onboarding has been completed
+    final prefs = await SharedPreferences.getInstance();
+    final onboardingCompleted = prefs.getBool('onboarding_completed') ?? false;
+
+    if (!mounted) return;
+
+    if (!onboardingCompleted) {
+      // Navigate to onboarding for first-time users
+      context.go('/onboarding');
+    } else {
+      // Check auth status for returning users
+      context.read<AuthBloc>().add(const CheckAuthStatus());
+    }
   }
 
   @override

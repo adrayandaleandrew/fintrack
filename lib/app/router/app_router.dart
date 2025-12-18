@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/categories/presentation/pages/category_list_page.dart';
 import '../../features/accounts/presentation/pages/account_list_page.dart';
 import '../../features/transactions/presentation/pages/transaction_list_page.dart';
@@ -38,6 +39,13 @@ class AppRouter {
           path: RoutePaths.splash,
           name: RouteNames.splash,
           builder: (context, state) => const SplashPage(),
+        ),
+
+        // ==================== Onboarding ====================
+        GoRoute(
+          path: '/onboarding',
+          name: 'onboarding',
+          builder: (context, state) => const OnboardingPage(),
         ),
 
         // ==================== Authentication ====================
