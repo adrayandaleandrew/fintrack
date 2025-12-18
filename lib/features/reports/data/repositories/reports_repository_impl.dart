@@ -33,9 +33,8 @@ class ReportsRepositoryImpl implements ReportsRepository {
   }) async {
     try {
       // Get all transactions for user
-      final transactionsResult = await transactionRepository.getTransactions(
-        userId: userId,
-      );
+      final transactionsResult =
+          await transactionRepository.getTransactions(userId);
 
       return transactionsResult.fold(
         (failure) => Left(failure),
@@ -131,9 +130,8 @@ class ReportsRepositoryImpl implements ReportsRepository {
   }) async {
     try {
       // Get all transactions for user
-      final transactionsResult = await transactionRepository.getTransactions(
-        userId: userId,
-      );
+      final transactionsResult =
+          await transactionRepository.getTransactions(userId);
 
       return transactionsResult.fold(
         (failure) => Left(failure),
@@ -238,9 +236,8 @@ class ReportsRepositoryImpl implements ReportsRepository {
   }) async {
     try {
       // Get all transactions for user
-      final transactionsResult = await transactionRepository.getTransactions(
-        userId: userId,
-      );
+      final transactionsResult =
+          await transactionRepository.getTransactions(userId);
 
       return transactionsResult.fold(
         (failure) => Left(failure),
