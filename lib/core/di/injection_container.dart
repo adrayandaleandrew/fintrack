@@ -108,6 +108,28 @@ import '../../features/recurring_transactions/domain/usecases/delete_recurring_t
 import '../../features/recurring_transactions/domain/usecases/process_due_recurring_transactions.dart';
 import '../../features/recurring_transactions/presentation/bloc/recurring_transaction_bloc.dart';
 
+// Reports
+import '../../features/reports/data/repositories/reports_repository_impl.dart';
+import '../../features/reports/domain/repositories/reports_repository.dart';
+import '../../features/reports/domain/usecases/get_expense_breakdown.dart';
+import '../../features/reports/domain/usecases/get_financial_trends.dart';
+import '../../features/reports/domain/usecases/get_monthly_comparison.dart';
+import '../../features/reports/presentation/bloc/reports_bloc.dart';
+
+// Currency
+import '../../features/currency/data/datasources/currency_local_datasource.dart';
+import '../../features/currency/data/datasources/currency_local_datasource_impl.dart';
+import '../../features/currency/data/datasources/currency_remote_datasource.dart';
+import '../../features/currency/data/datasources/currency_remote_datasource_mock.dart';
+import '../../features/currency/data/repositories/currency_repository_impl.dart';
+import '../../features/currency/domain/repositories/currency_repository.dart';
+import '../../features/currency/domain/usecases/convert_currency.dart';
+import '../../features/currency/domain/usecases/get_base_currency.dart';
+import '../../features/currency/domain/usecases/get_currencies.dart';
+import '../../features/currency/domain/usecases/get_exchange_rates.dart';
+import '../../features/currency/domain/usecases/update_base_currency.dart';
+import '../../features/currency/presentation/bloc/currency_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -592,6 +614,75 @@ Future<void> initializeDependencies() async {
       updateBudget: sl(),
       deleteBudget: sl(),
       calculateBudgetUsage: sl(),
+    ),
+  );
+
+  // ==================== Reports Feature ====================
+
+  // Repositories
+  sl.registerLazySingleton<ReportsRepository>(
+    () => ReportsRepositoryImpl(
+      transactionRepository: sl(),
+      categoryRepository: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(
+    () => GetExpenseBreakdown(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => GetFinancialTrends(sl()),
+  );
+
+  sl.registerLazySingleton(
+    () => GetMonthlyComparison(sl()),
+  );
+
+  // BLoC
+  sl.registerFactory(
+    () => ReportsBloc(
+      getExpenseBreakdown: sl(),
+      getFinancialTrends: sl(),
+      getMonthlyComparison: sl(),
+    ),
+  );
+
+  // ==================== Currency Feature ====================
+
+  // Data Sources
+  sl.registerLazySingleton<CurrencyRemoteDataSource>(
+    () => CurrencyRemoteDataSourceMock(),
+  );
+
+  sl.registerLazySingleton<CurrencyLocalDataSource>(
+    () => CurrencyLocalDataSourceImpl(),
+  );
+
+  // Repository
+  sl.registerLazySingleton<CurrencyRepository>(
+    () => CurrencyRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetCurrencies(sl()));
+  sl.registerLazySingleton(() => GetExchangeRates(sl()));
+  sl.registerLazySingleton(() => ConvertCurrency(sl()));
+  sl.registerLazySingleton(() => GetBaseCurrency(sl()));
+  sl.registerLazySingleton(() => UpdateBaseCurrency(sl()));
+
+  // BLoC
+  sl.registerFactory(
+    () => CurrencyBloc(
+      getCurrencies: sl(),
+      getExchangeRates: sl(),
+      convertCurrency: sl(),
+      getBaseCurrency: sl(),
+      updateBaseCurrency: sl(),
     ),
   );
 }

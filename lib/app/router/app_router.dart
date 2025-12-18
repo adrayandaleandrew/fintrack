@@ -14,6 +14,8 @@ import '../../features/budgets/presentation/pages/budget_form_page.dart';
 import '../../features/budgets/presentation/pages/budget_detail_page.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_list_page.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_form_page.dart';
+import '../../features/reports/presentation/pages/reports_page.dart';
+import '../../features/currency/presentation/pages/settings_page.dart';
 import 'route_names.dart';
 import 'route_paths.dart';
 
@@ -247,45 +249,17 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.reports,
           name: RouteNames.reports,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Reports',
-            description: 'Reports overview with charts and analytics',
+          builder: (context, state) => const ReportsPage(
+            userId: 'user_1', // TODO: Get from auth state
           ),
-          routes: [
-            GoRoute(
-              path: 'expense-breakdown',
-              name: RouteNames.expenseBreakdown,
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Expense Breakdown',
-                description: 'Pie chart showing expense by category',
-              ),
-            ),
-            GoRoute(
-              path: 'income-trends',
-              name: RouteNames.incomeTrends,
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Income Trends',
-                description: 'Line chart showing income over time',
-              ),
-            ),
-            GoRoute(
-              path: 'monthly-comparison',
-              name: RouteNames.monthlyComparison,
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Monthly Comparison',
-                description: 'Bar chart comparing monthly spending',
-              ),
-            ),
-          ],
         ),
 
         // ==================== Settings ====================
         GoRoute(
           path: RoutePaths.settings,
           name: RouteNames.settings,
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Settings',
-            description: 'App settings and preferences',
+          builder: (context, state) => const SettingsPage(
+            userId: 'user_1', // TODO: Get from auth state
           ),
           routes: [
             GoRoute(
