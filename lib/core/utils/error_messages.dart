@@ -35,7 +35,7 @@ class ErrorMessages {
   static const String emailAlreadyExists =
       'This email is already registered. Try logging in instead.';
 
-  static const String accountNotFound =
+  static const String authAccountNotFound =
       'No account found with this email. Please check or create a new account.';
 
   static const String sessionExpired =
