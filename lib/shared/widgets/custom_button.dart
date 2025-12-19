@@ -132,7 +132,16 @@ class CustomButton extends StatelessWidget {
         break;
     }
 
-    return button;
+    // Add semantic labels for accessibility
+    return Semantics(
+      button: true,
+      enabled: effectiveOnPressed != null,
+      label: isLoading ? '$text, loading' : text,
+      hint: effectiveOnPressed == null && !isLoading
+          ? 'Button is disabled'
+          : 'Double tap to activate',
+      child: button,
+    );
   }
 
   Widget _buildButtonContent() {

@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import '../../../../core/utils/error_messages.dart';
 import '../../domain/usecases/create_transaction.dart' as create_usecase;
 import '../../domain/usecases/delete_transaction.dart' as delete_usecase;
 import '../../domain/usecases/filter_transactions.dart' as filter_usecase;
@@ -52,7 +53,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     );
 
     result.fold(
-      (failure) => emit(TransactionError(message: failure.message)),
+      (failure) => emit(TransactionError(
+        message: ErrorMessages.getErrorMessage(failure.message),
+      )),
       (transactions) => emit(TransactionsLoaded(transactions: transactions)),
     );
   }
@@ -69,7 +72,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     );
 
     result.fold(
-      (failure) => emit(TransactionError(message: failure.message)),
+      (failure) => emit(TransactionError(
+        message: ErrorMessages.getErrorMessage(failure.message),
+      )),
       (transaction) => emit(TransactionLoaded(transaction: transaction)),
     );
   }
@@ -86,7 +91,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     );
 
     result.fold(
-      (failure) => emit(TransactionError(message: failure.message)),
+      (failure) => emit(TransactionError(
+        message: ErrorMessages.getErrorMessage(failure.message),
+      )),
       (transaction) => emit(
         TransactionActionSuccess(
           message: 'Transaction created successfully',
@@ -108,7 +115,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     );
 
     result.fold(
-      (failure) => emit(TransactionError(message: failure.message)),
+      (failure) => emit(TransactionError(
+        message: ErrorMessages.getErrorMessage(failure.message),
+      )),
       (transaction) => emit(
         TransactionActionSuccess(
           message: 'Transaction updated successfully',
@@ -130,7 +139,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     );
 
     result.fold(
-      (failure) => emit(TransactionError(message: failure.message)),
+      (failure) => emit(TransactionError(
+        message: ErrorMessages.getErrorMessage(failure.message),
+      )),
       (_) => emit(
         const TransactionActionSuccess(
           message: 'Transaction deleted successfully',
@@ -158,7 +169,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     );
 
     result.fold(
-      (failure) => emit(TransactionError(message: failure.message)),
+      (failure) => emit(TransactionError(
+        message: ErrorMessages.getErrorMessage(failure.message),
+      )),
       (transactions) => emit(TransactionsLoaded(transactions: transactions)),
     );
   }
@@ -178,7 +191,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     );
 
     result.fold(
-      (failure) => emit(TransactionError(message: failure.message)),
+      (failure) => emit(TransactionError(
+        message: ErrorMessages.getErrorMessage(failure.message),
+      )),
       (transactions) => emit(TransactionsLoaded(transactions: transactions)),
     );
   }

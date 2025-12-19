@@ -29,63 +29,78 @@ class TransactionListItem extends StatelessWidget {
     Color amountColor;
     IconData icon;
     Color iconBgColor;
+    String transactionType;
 
     if (isIncome) {
       amountColor = Colors.green;
       icon = Icons.arrow_downward;
       iconBgColor = Colors.green.withValues(alpha: 0.1);
+      transactionType = 'Income';
     } else if (isExpense) {
       amountColor = Colors.red;
       icon = Icons.arrow_upward;
       iconBgColor = Colors.red.withValues(alpha: 0.1);
+      transactionType = 'Expense';
     } else {
       amountColor = Colors.blue;
       icon = Icons.swap_horiz;
       iconBgColor = Colors.blue.withValues(alpha: 0.1);
+      transactionType = 'Transfer';
     }
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: iconBgColor,
-          child: Icon(icon, color: amountColor, size: 20),
-        ),
-        title: Text(
-          transaction.description,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 16,
+    final formattedAmount = CurrencyFormatter.format(
+      amount: transaction.amount,
+      currencyCode: transaction.currency,
+    );
+    final amountPrefix = isExpense ? '-' : isIncome ? '+' : '';
+
+    return Semantics(
+      button: true,
+      label: '$transactionType: ${transaction.description}, $amountPrefix$formattedAmount, ${_formatTime(transaction.date)}${transaction.notes != null && transaction.notes!.isNotEmpty ? ', has notes' : ''}',
+      hint: 'Double tap to view details, long press for options',
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: ListTile(
+          leading: CircleAvatar(
+            backgroundColor: iconBgColor,
+            child: Icon(icon, color: amountColor, size: 20),
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          _formatTime(transaction.date),
-          style: const TextStyle(fontSize: 12, color: Colors.grey),
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${isExpense ? '-' : isIncome ? '+' : ''}${CurrencyFormatter.format(amount: transaction.amount, currencyCode: transaction.currency)}',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: amountColor,
-              ),
+          title: Text(
+            transaction.description,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
             ),
-            if (transaction.notes != null && transaction.notes!.isNotEmpty)
-              const Icon(
-                Icons.note,
-                size: 12,
-                color: Colors.grey,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(
+            _formatTime(transaction.date),
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '$amountPrefix$formattedAmount',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: amountColor,
+                ),
               ),
-          ],
+              if (transaction.notes != null && transaction.notes!.isNotEmpty)
+                const Icon(
+                  Icons.note,
+                  size: 12,
+                  color: Colors.grey,
+                ),
+            ],
+          ),
+          onTap: onTap,
+          onLongPress: onLongPress,
         ),
-        onTap: onTap,
-        onLongPress: onLongPress,
       ),
     );
   }
