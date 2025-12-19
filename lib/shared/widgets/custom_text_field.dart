@@ -205,33 +205,40 @@ class CustomTextField extends StatefulWidget {
 class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: widget.controller,
-      decoration: InputDecoration(
-        labelText: widget.label,
-        hintText: widget.hint,
-        prefixIcon: widget.prefixIcon != null
-            ? Icon(widget.prefixIcon)
-            : null,
-        suffixIcon: widget.suffixIcon != null
-            ? IconButton(
-                icon: Icon(widget.suffixIcon),
-                onPressed: widget.onSuffixIconPressed,
-              )
-            : null,
-        counterText: widget.maxLength != null ? null : '',
-      ),
-      validator: widget.validator,
-      keyboardType: widget.keyboardType,
-      obscureText: widget.obscureText,
+    return Semantics(
+      textField: true,
       enabled: widget.enabled,
       readOnly: widget.readOnly,
-      maxLines: widget.maxLines,
-      maxLength: widget.maxLength,
-      inputFormatters: widget.inputFormatters,
-      onChanged: widget.onChanged,
-      autovalidateMode: widget.autovalidateMode,
-      textCapitalization: widget.textCapitalization,
+      label: widget.label,
+      hint: widget.hint ?? 'Enter ${widget.label.toLowerCase()}',
+      child: TextFormField(
+        controller: widget.controller,
+        decoration: InputDecoration(
+          labelText: widget.label,
+          hintText: widget.hint,
+          prefixIcon: widget.prefixIcon != null
+              ? Icon(widget.prefixIcon)
+              : null,
+          suffixIcon: widget.suffixIcon != null
+              ? IconButton(
+                  icon: Icon(widget.suffixIcon),
+                  onPressed: widget.onSuffixIconPressed,
+                )
+              : null,
+          counterText: widget.maxLength != null ? null : '',
+        ),
+        validator: widget.validator,
+        keyboardType: widget.keyboardType,
+        obscureText: widget.obscureText,
+        enabled: widget.enabled,
+        readOnly: widget.readOnly,
+        maxLines: widget.maxLines,
+        maxLength: widget.maxLength,
+        inputFormatters: widget.inputFormatters,
+        onChanged: widget.onChanged,
+        autovalidateMode: widget.autovalidateMode,
+        textCapitalization: widget.textCapitalization,
+      ),
     );
   }
 }
@@ -264,21 +271,24 @@ class _PasswordTextFieldState extends State<_PasswordTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomTextField(
-      controller: widget.controller,
-      label: widget.label,
-      hint: widget.hint,
-      validator: widget.validator,
-      obscureText: _obscureText,
-      prefixIcon: Icons.lock_outlined,
-      suffixIcon: _obscureText ? Icons.visibility : Icons.visibility_off,
-      onSuffixIconPressed: () {
-        setState(() {
-          _obscureText = !_obscureText;
-        });
-      },
-      enabled: widget.enabled,
-      onChanged: widget.onChanged,
+    return Semantics(
+      container: true,
+      child: CustomTextField(
+        controller: widget.controller,
+        label: widget.label,
+        hint: widget.hint,
+        validator: widget.validator,
+        obscureText: _obscureText,
+        prefixIcon: Icons.lock_outlined,
+        suffixIcon: _obscureText ? Icons.visibility : Icons.visibility_off,
+        onSuffixIconPressed: () {
+          setState(() {
+            _obscureText = !_obscureText;
+          });
+        },
+        enabled: widget.enabled,
+        onChanged: widget.onChanged,
+      ),
     );
   }
 }

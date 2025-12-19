@@ -21,92 +21,108 @@ class AccountCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _parseColor(account.color);
+    final formattedBalance = CurrencyFormatter.format(
+      amount: account.balance,
+      currencyCode: account.currency,
+    );
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Icon
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+    final creditLimitText = account.type == AccountType.creditCard &&
+            account.creditLimit != null
+        ? ', Credit limit ${CurrencyFormatter.format(
+            amount: account.creditLimit!,
+            currencyCode: account.currency,
+          )}'
+        : '';
+
+    final statusText = showStatus && !account.isActive ? ', Inactive' : '';
+
+    return Semantics(
+      button: true,
+      label: '${account.type.displayName} account: ${account.name}, Balance $formattedBalance$creditLimitText$statusText',
+      hint: 'Double tap to view account details',
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Icon
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    _getIconData(account.icon),
+                    color: color,
+                    size: 28,
+                  ),
                 ),
-                child: Icon(
-                  _getIconData(account.icon),
-                  color: color,
-                  size: 28,
+                const SizedBox(width: 16),
+                // Account info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        account.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        account.type.displayName,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      if (showStatus && !account.isActive)
+                        const Text(
+                          'Inactive',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.orange,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 16),
-              // Account info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                // Balance
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      account.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      account.type.displayName,
+                      formattedBalance,
                       style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: account.balance >= 0 ? Colors.green : Colors.red,
                       ),
                     ),
-                    if (showStatus && !account.isActive)
-                      const Text(
-                        'Inactive',
+                    if (account.type == AccountType.creditCard &&
+                        account.creditLimit != null)
+                      Text(
+                        'Limit: ${CurrencyFormatter.format(
+                          amount: account.creditLimit!,
+                          currencyCode: account.currency,
+                        )}',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.orange,
-                          fontStyle: FontStyle.italic,
+                          color: Colors.grey[600],
                         ),
                       ),
                   ],
                 ),
-              ),
-              // Balance
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    CurrencyFormatter.format(
-                      amount: account.balance,
-                      currencyCode: account.currency,
-                    ),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: account.balance >= 0 ? Colors.green : Colors.red,
-                    ),
-                  ),
-                  if (account.type == AccountType.creditCard &&
-                      account.creditLimit != null)
-                    Text(
-                      'Limit: ${CurrencyFormatter.format(
-                        amount: account.creditLimit!,
-                        currencyCode: account.currency,
-                      )}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
