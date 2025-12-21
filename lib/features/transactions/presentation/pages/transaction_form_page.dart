@@ -6,6 +6,8 @@ import '../../domain/entities/transaction.dart';
 import '../bloc/transaction_bloc.dart';
 import '../bloc/transaction_event.dart';
 import '../bloc/transaction_state.dart';
+import '../widgets/account_selector.dart';
+import '../widgets/category_selector.dart';
 
 /// Page for adding or editing a transaction
 ///
@@ -17,10 +19,12 @@ import '../bloc/transaction_state.dart';
 /// - Date and time picker
 /// - Amount input with currency formatting
 class TransactionFormPage extends StatefulWidget {
+  final String userId;
   final Transaction? transaction;
 
   const TransactionFormPage({
     super.key,
+    required this.userId,
     this.transaction,
   });
 
@@ -220,79 +224,33 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
   }
 
   Widget _buildAccountSelector() {
-    return DropdownButtonFormField<String>(
-      value: _selectedAccountId,
-      decoration: const InputDecoration(
-        labelText: 'Account',
-        border: OutlineInputBorder(),
-      ),
-      items: const [
-        DropdownMenuItem(value: 'acc_1', child: Text('Checking Account')),
-        DropdownMenuItem(value: 'acc_2', child: Text('Savings Account')),
-        DropdownMenuItem(value: 'acc_3', child: Text('Cash')),
-        DropdownMenuItem(value: 'acc_4', child: Text('Credit Card')),
-        DropdownMenuItem(value: 'acc_5', child: Text('Investment')),
-      ],
-      onChanged: (value) => setState(() => _selectedAccountId = value),
-      validator: (value) {
-        if (value == null) {
-          return 'Please select an account';
-        }
-        return null;
-      },
+    return AccountSelector(
+      userId: widget.userId,
+      selectedAccountId: _selectedAccountId,
+      onAccountSelected: (value) => setState(() => _selectedAccountId = value),
+      label: 'Account',
+      showBalance: true,
     );
   }
 
   Widget _buildToAccountSelector() {
-    return DropdownButtonFormField<String>(
-      value: _selectedToAccountId,
-      decoration: const InputDecoration(
-        labelText: 'To Account',
-        border: OutlineInputBorder(),
-      ),
-      items: const [
-        DropdownMenuItem(value: 'acc_1', child: Text('Checking Account')),
-        DropdownMenuItem(value: 'acc_2', child: Text('Savings Account')),
-        DropdownMenuItem(value: 'acc_3', child: Text('Cash')),
-        DropdownMenuItem(value: 'acc_4', child: Text('Credit Card')),
-        DropdownMenuItem(value: 'acc_5', child: Text('Investment')),
-      ],
-      onChanged: (value) => setState(() => _selectedToAccountId = value),
-      validator: (value) {
-        if (_selectedType == TransactionType.transfer && value == null) {
-          return 'Please select a destination account';
-        }
-        if (value == _selectedAccountId) {
-          return 'Cannot transfer to the same account';
-        }
-        return null;
-      },
+    return AccountSelector(
+      userId: widget.userId,
+      selectedAccountId: _selectedToAccountId,
+      onAccountSelected: (value) => setState(() => _selectedToAccountId = value),
+      label: 'To Account',
+      showBalance: true,
+      excludeAccountId: _selectedAccountId, // Exclude source account
     );
   }
 
   Widget _buildCategorySelector() {
-    return DropdownButtonFormField<String>(
-      value: _selectedCategoryId,
-      decoration: const InputDecoration(
-        labelText: 'Category',
-        border: OutlineInputBorder(),
-      ),
-      items: const [
-        // Income categories
-        DropdownMenuItem(value: 'cat_1', child: Text('Salary')),
-        DropdownMenuItem(value: 'cat_2', child: Text('Freelance')),
-        // Expense categories
-        DropdownMenuItem(value: 'cat_11', child: Text('Food & Dining')),
-        DropdownMenuItem(value: 'cat_12', child: Text('Groceries')),
-        DropdownMenuItem(value: 'cat_13', child: Text('Transportation')),
-      ],
-      onChanged: (value) => setState(() => _selectedCategoryId = value),
-      validator: (value) {
-        if (_selectedType != TransactionType.transfer && value == null) {
-          return 'Please select a category';
-        }
-        return null;
-      },
+    return CategorySelector(
+      userId: widget.userId,
+      selectedCategoryId: _selectedCategoryId,
+      onCategorySelected: (value) => setState(() => _selectedCategoryId = value),
+      transactionType: _selectedType,
+      label: 'Category',
     );
   }
 
@@ -356,7 +314,7 @@ class _TransactionFormPageState extends State<TransactionFormPage> {
 
     final transaction = Transaction(
       id: widget.transaction?.id ?? 'txn_${DateTime.now().millisecondsSinceEpoch}',
-      userId: 'user_1',
+      userId: widget.userId,
       accountId: _selectedAccountId!,
       categoryId: _selectedCategoryId ?? '',
       type: _selectedType,
