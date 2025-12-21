@@ -922,7 +922,7 @@ Closes #45
 - ✅ **AccountSelector Refactored** - Dynamic data loading from AccountBloc
   - Removed all hardcoded mock account data
   - Real-time account loading with BLoC integration
-  - Shows current balance with CurrencyFormatter
+  - Shows current balance with CurrencyFormatter (fixed named parameter call)
   - Filters active accounts and excludes accounts for transfers
   - Handles loading, error, and empty states
 - ✅ **CategorySelector Refactored** - Dynamic data loading from CategoryBloc
@@ -933,6 +933,12 @@ Closes #45
   - Parses icon names and color hex codes
   - Shows lock icon for default categories
   - Handles loading, error, and empty states
+
+**Recent Bug Fixes (2025-12-21):**
+- ✅ Fixed AccountSelector CurrencyFormatter.format() call - changed from positional to named parameters
+  - Issue: `CurrencyFormatter.format(account.balance, account.currency)` caused compilation error
+  - Fix: `CurrencyFormatter.format(amount: account.balance, currencyCode: account.currency)`
+  - Location: `lib/features/transactions/presentation/widgets/account_selector.dart:124`
 
 **What's Working:**
 - 🎯 All 321 tests passing with zero errors
