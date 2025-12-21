@@ -394,7 +394,7 @@ class _RecurringTransactionFormPageState
 
                   // Save Button
                   ElevatedButton(
-                    onPressed: state is RecurringTransactionActionInProgress
+                    onPressed: state is RecurringTransactionLoading
                         ? null
                         : _saveRecurringTransaction,
                     style: ElevatedButton.styleFrom(
@@ -402,7 +402,7 @@ class _RecurringTransactionFormPageState
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                     ),
-                    child: state is RecurringTransactionActionInProgress
+                    child: state is RecurringTransactionLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
