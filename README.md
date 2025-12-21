@@ -955,6 +955,11 @@ Closes #45
   - Fix: Applied same pattern - Row with `mainAxisSize: MainAxisSize.min`, replaced `Expanded` with `Flexible`
   - Location: `lib/features/transactions/presentation/widgets/category_selector.dart:107-130`
 
+- ✅ Fixed AccountSelector vertical overflow - RenderFlex overflowed by 18 pixels
+  - Issue: Column with account name + balance exceeded 24px dropdown height constraint
+  - Fix: Simplified dropdown items to show only account name (removed balance display from dropdown)
+  - Location: `lib/features/transactions/presentation/widgets/account_selector.dart:104-122`
+
 **What's Working:**
 - 🎯 All 321 tests passing with zero errors
 - 🎯 Comprehensive test coverage for critical business logic
