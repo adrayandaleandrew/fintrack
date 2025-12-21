@@ -34,7 +34,7 @@ class BudgetDetailPage extends StatelessWidget {
   const BudgetDetailPage({
     super.key,
     required this.budgetId,
-    this.userId = 'user_1', // TODO: Get from auth
+    required this.userId,
   });
 
   @override

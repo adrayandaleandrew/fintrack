@@ -980,6 +980,19 @@ Closes #45
   - Pull-to-refresh support
   - Location: `lib/features/budgets/presentation/pages/budget_detail_page.dart` (730 lines)
 
+- ✅ Fixed hardcoded 'user_1' authentication integration issue
+  - Issue: Budget pages used default 'user_1' instead of authenticated user ID
+  - Fix: Removed default values, made userId required parameter
+  - Updated BudgetDetailPage, BudgetFormPage constructors to require userId
+  - Fixed BudgetListPage filter toggle to use widget.userId instead of hardcoded value
+  - Updated router to pass _getUserId(context) for budget add/edit routes
+  - Impact: All budget operations now use real authenticated user, enabling proper multi-user support
+  - Locations:
+    - `lib/features/budgets/presentation/pages/budget_detail_page.dart:37`
+    - `lib/features/budgets/presentation/pages/budget_form_page.dart:24`
+    - `lib/features/budgets/presentation/pages/budget_list_page.dart:68-70`
+    - `lib/app/router/app_router.dart:223-225`
+
 **What's Working:**
 - 🎯 All 321 tests passing with zero errors
 - 🎯 Comprehensive test coverage for critical business logic

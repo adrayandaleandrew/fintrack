@@ -21,7 +21,7 @@ class BudgetFormPage extends StatefulWidget {
   const BudgetFormPage({
     super.key,
     this.budget,
-    this.userId = 'user_1', // TODO: Get from auth
+    required this.userId,
   });
 
   @override
