@@ -122,8 +122,8 @@ class AccountSelector extends StatelessWidget {
                             if (showBalance)
                               Text(
                                 CurrencyFormatter.format(
-                                  account.balance,
-                                  account.currency,
+                                  amount: account.balance,
+                                  currencyCode: account.currency,
                                 ),
                                 style: TextStyle(
                                   fontSize: 12,
