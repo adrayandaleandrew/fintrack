@@ -220,6 +220,17 @@ class _RecurringTransactionListViewState
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(
+                  '/recurring-transactions/${recurring.id}/edit',
+                  extra: recurring,
+                );
+              },
+            ),
+            ListTile(
               leading: Icon(recurring.isActive ? Icons.pause : Icons.play_arrow),
               title: Text(recurring.isActive ? 'Pause' : 'Resume'),
               onTap: () {
