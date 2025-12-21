@@ -2021,6 +2021,8 @@ With potentially thousands of transactions:
 - ✅ **Bug Fix:** Navigation errors fixed - updated all Navigator.pushNamed to context.push (go_router)
 - ✅ **Bug Fix:** AccountSelector layout rendering errors fixed (RenderFlex constraints issue)
 - ✅ **Bug Fix:** CategorySelector layout rendering errors fixed (same RenderFlex constraints issue)
+- ✅ **Bug Fix:** AccountSelector vertical overflow fixed (removed balance from dropdown items)
+- ✅ **Feature Implemented:** RecurringTransactionFormPage - Full form with all fields for creating/editing recurring transactions
 
 ### 📋 Next Phases
 
