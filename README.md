@@ -950,6 +950,11 @@ Closes #45
   - Fix: Changed Row to use `mainAxisSize: MainAxisSize.min`, replaced `Expanded` with `Flexible`, added `overflow: TextOverflow.ellipsis`
   - Location: `lib/features/transactions/presentation/widgets/account_selector.dart:104-142`
 
+- ✅ Fixed CategorySelector rendering errors - RenderFlex layout constraints issue
+  - Issue: Same "RenderFlex children have non-zero flex but incoming width constraints are unbounded" error in category dropdown
+  - Fix: Applied same pattern - Row with `mainAxisSize: MainAxisSize.min`, replaced `Expanded` with `Flexible`
+  - Location: `lib/features/transactions/presentation/widgets/category_selector.dart:107-130`
+
 **What's Working:**
 - 🎯 All 321 tests passing with zero errors
 - 🎯 Comprehensive test coverage for critical business logic
