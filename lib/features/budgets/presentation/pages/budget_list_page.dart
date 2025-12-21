@@ -65,11 +65,8 @@ class _BudgetListViewState extends State<_BudgetListView> {
               setState(() {
                 _activeOnly = !_activeOnly;
               });
-              final userId = (context.read<BudgetBloc>().state is BudgetsLoaded)
-                  ? 'user_1' // TODO: Get from auth
-                  : 'user_1';
               context.read<BudgetBloc>().add(
-                    LoadBudgets(userId: userId, activeOnly: _activeOnly),
+                    LoadBudgets(userId: widget.userId, activeOnly: _activeOnly),
                   );
             },
             tooltip: _activeOnly ? 'Show All' : 'Show Active Only',

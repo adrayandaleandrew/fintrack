@@ -220,7 +220,9 @@ class AppRouter {
             GoRoute(
               path: 'add',
               name: RouteNames.addBudget,
-              builder: (context, state) => const BudgetFormPage(),
+              builder: (context, state) => BudgetFormPage(
+                userId: _getUserId(context),
+              ),
             ),
             GoRoute(
               path: ':id',
