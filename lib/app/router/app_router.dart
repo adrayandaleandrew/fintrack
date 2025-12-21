@@ -16,6 +16,7 @@ import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/budgets/presentation/pages/budget_list_page.dart';
 import '../../features/budgets/presentation/pages/budget_form_page.dart';
 import '../../features/budgets/presentation/pages/budget_detail_page.dart';
+import '../../features/budgets/domain/entities/budget.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_list_page.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_form_page.dart';
 import '../../features/recurring_transactions/domain/entities/recurring_transaction.dart';
@@ -226,17 +227,20 @@ class AppRouter {
               name: RouteNames.budgetDetail,
               builder: (context, state) {
                 final id = state.pathParameters['id']!;
-                return BudgetDetailPage(budgetId: id);
+                return BudgetDetailPage(
+                  budgetId: id,
+                  userId: _getUserId(context),
+                );
               },
             ),
             GoRoute(
-              path: ':id/edit',
+              path: 'edit',
               name: RouteNames.editBudget,
               builder: (context, state) {
-                final id = state.pathParameters['id']!;
-                return _PlaceholderPage(
-                  title: 'Edit Budget',
-                  description: 'Edit budget $id',
+                final budget = state.extra as Budget?;
+                return BudgetFormPage(
+                  budget: budget,
+                  userId: _getUserId(context),
                 );
               },
             ),
