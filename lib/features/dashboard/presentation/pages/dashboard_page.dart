@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../domain/entities/dashboard_summary.dart';
 import '../bloc/dashboard_bloc.dart';
@@ -30,13 +31,15 @@ class DashboardPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<DashboardBloc>()
         ..add(LoadDashboardSummary(userId: userId)),
-      child: const _DashboardView(),
+      child: _DashboardView(userId: userId),
     );
   }
 }
 
 class _DashboardView extends StatelessWidget {
-  const _DashboardView();
+  final String userId;
+
+  const _DashboardView({required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +51,7 @@ class _DashboardView extends StatelessWidget {
             icon: const Icon(Icons.refresh),
             onPressed: () {
               context.read<DashboardBloc>().add(
-                    const RefreshDashboard(userId: 'user_1'),
+                    RefreshDashboard(userId: userId),
                   );
             },
             tooltip: 'Refresh',
@@ -81,7 +84,7 @@ class _DashboardView extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () async {
         context.read<DashboardBloc>().add(
-              const RefreshDashboard(userId: 'user_1'),
+              RefreshDashboard(userId: userId),
             );
         // Wait a bit for the refresh to complete
         await Future.delayed(const Duration(milliseconds: 500));
@@ -233,7 +236,7 @@ class _DashboardView extends StatelessWidget {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () => context.read<DashboardBloc>().add(
-                    const LoadDashboardSummary(userId: 'user_1'),
+                    LoadDashboardSummary(userId: userId),
                   ),
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
@@ -251,18 +254,18 @@ class _DashboardView extends StatelessWidget {
   }
 
   void _navigateToAddTransaction(BuildContext context) {
-    Navigator.of(context).pushNamed('/transactions/add');
+    context.push('/transactions/add');
   }
 
   void _navigateToAddAccount(BuildContext context) {
-    Navigator.of(context).pushNamed('/accounts/add');
+    context.push('/accounts/add');
   }
 
   void _navigateToAccounts(BuildContext context) {
-    Navigator.of(context).pushNamed('/accounts');
+    context.push('/accounts');
   }
 
   void _navigateToTransactions(BuildContext context) {
-    Navigator.of(context).pushNamed('/transactions');
+    context.push('/transactions');
   }
 }

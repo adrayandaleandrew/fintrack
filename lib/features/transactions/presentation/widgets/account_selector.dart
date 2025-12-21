@@ -102,6 +102,7 @@ class AccountSelector extends StatelessWidget {
                 return DropdownMenuItem<String>(
                   value: account.id,
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         _getAccountIcon(account.type),
@@ -109,7 +110,7 @@ class AccountSelector extends StatelessWidget {
                         color: Colors.grey[700],
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                      Flexible(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
@@ -118,6 +119,7 @@ class AccountSelector extends StatelessWidget {
                               account.name,
                               style:
                                   const TextStyle(fontWeight: FontWeight.w500),
+                              overflow: TextOverflow.ellipsis,
                             ),
                             if (showBalance)
                               Text(
@@ -131,6 +133,7 @@ class AccountSelector extends StatelessWidget {
                                       ? Colors.green[700]
                                       : Colors.red[700],
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                           ],
                         ),

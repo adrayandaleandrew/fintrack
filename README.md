@@ -940,6 +940,16 @@ Closes #45
   - Fix: `CurrencyFormatter.format(amount: account.balance, currencyCode: account.currency)`
   - Location: `lib/features/transactions/presentation/widgets/account_selector.dart:124`
 
+- ✅ Fixed navigation errors - updated from Navigator.pushNamed to go_router context methods
+  - Issue: `Navigator.onGenerateRoute was null` errors throughout the app
+  - Fix: Changed all `Navigator.of(context).pushNamed()` to `context.push()`
+  - Affected files: dashboard_page.dart, transaction_list_page.dart, budget_list_page.dart, recurring_transaction_list_page.dart, recent_transactions_widget.dart
+
+- ✅ Fixed AccountSelector rendering errors - RenderFlex layout constraints issue
+  - Issue: "RenderFlex children have non-zero flex but incoming width constraints are unbounded"
+  - Fix: Changed Row to use `mainAxisSize: MainAxisSize.min`, replaced `Expanded` with `Flexible`, added `overflow: TextOverflow.ellipsis`
+  - Location: `lib/features/transactions/presentation/widgets/account_selector.dart:104-142`
+
 **What's Working:**
 - 🎯 All 321 tests passing with zero errors
 - 🎯 Comprehensive test coverage for critical business logic

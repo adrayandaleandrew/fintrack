@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../transactions/domain/entities/transaction.dart';
 import '../../../transactions/presentation/widgets/transaction_list_item.dart';
 
@@ -82,6 +83,6 @@ class RecentTransactionsWidget extends StatelessWidget {
   }
 
   void _navigateToDetail(BuildContext context, String transactionId) {
-    Navigator.of(context).pushNamed('/transactions/$transactionId');
+    context.push('/transactions/$transactionId');
   }
 }
