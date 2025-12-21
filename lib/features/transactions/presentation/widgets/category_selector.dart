@@ -105,6 +105,7 @@ class CategorySelector extends StatelessWidget {
                 return DropdownMenuItem<String>(
                   value: category.id,
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         _getCategoryIcon(category.icon),
@@ -112,7 +113,7 @@ class CategorySelector extends StatelessWidget {
                         color: _parseColor(category.color),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                      Flexible(
                         child: Text(
                           category.name,
                           style: const TextStyle(fontWeight: FontWeight.w500),
