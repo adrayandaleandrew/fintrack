@@ -534,10 +534,7 @@ class _BudgetDetailView extends StatelessWidget {
     context.read<TransactionBloc>().add(
           FilterTransactions(
             userId: userId,
-            filters: {
-              'categoryId': budget.categoryId,
-              // Add date range based on budget period
-            },
+            categoryId: budget.categoryId,
           ),
         );
 
@@ -620,21 +617,23 @@ class _BudgetDetailView extends StatelessWidget {
             return const SizedBox.shrink();
           },
         ),
-        if (BlocProvider.of<TransactionBloc>(context).state
-            is TransactionsLoaded) ...[
-          final state = BlocProvider.of<TransactionBloc>(context).state
-              as TransactionsLoaded;
-          final categoryTransactions =
-              state.transactions.where((t) => t.categoryId == budget.categoryId);
-          if (categoryTransactions.length > 10)
-            TextButton(
-              onPressed: () {
-                // Navigate to transactions page with category filter
-                context.push('/transactions');
-              },
-              child: const Text('View All Transactions'),
-            ),
-        ],
+        BlocBuilder<TransactionBloc, TransactionState>(
+          builder: (context, state) {
+            if (state is TransactionsLoaded) {
+              final categoryTransactions =
+                  state.transactions.where((t) => t.categoryId == budget.categoryId).toList();
+              if (categoryTransactions.length > 10) {
+                return TextButton(
+                  onPressed: () {
+                    context.push('/transactions');
+                  },
+                  child: const Text('View All Transactions'),
+                );
+              }
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ],
     );
   }
