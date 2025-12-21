@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../categories/presentation/bloc/category_bloc.dart';
 import '../../../categories/presentation/bloc/category_event.dart';
@@ -34,13 +35,15 @@ class BudgetListPage extends StatelessWidget {
             ..add(LoadCategories(userId: userId)),
         ),
       ],
-      child: const _BudgetListView(),
+      child: _BudgetListView(userId: userId),
     );
   }
 }
 
 class _BudgetListView extends StatefulWidget {
-  const _BudgetListView();
+  final String userId;
+
+  const _BudgetListView({required this.userId});
 
   @override
   State<_BudgetListView> createState() => _BudgetListViewState();
@@ -124,7 +127,7 @@ class _BudgetListViewState extends State<_BudgetListView> {
     return RefreshIndicator(
       onRefresh: () async {
         context.read<BudgetBloc>().add(
-              RefreshBudgets(userId: 'user_1', activeOnly: _activeOnly),
+              RefreshBudgets(userId: widget.userId, activeOnly: _activeOnly),
             );
         await Future.delayed(const Duration(milliseconds: 500));
       },
@@ -279,7 +282,7 @@ class _BudgetListViewState extends State<_BudgetListView> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () => context.read<BudgetBloc>().add(
-                    LoadBudgets(userId: 'user_1', activeOnly: _activeOnly),
+                    LoadBudgets(userId: widget.userId, activeOnly: _activeOnly),
                   ),
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
@@ -297,10 +300,10 @@ class _BudgetListViewState extends State<_BudgetListView> {
   }
 
   void _navigateToAddBudget(BuildContext context) {
-    Navigator.of(context).pushNamed('/budgets/add');
+    context.push('/budgets/add');
   }
 
   void _navigateToBudgetDetail(BuildContext context, String budgetId) {
-    Navigator.of(context).pushNamed('/budgets/$budgetId');
+    context.push('/budgets/$budgetId');
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../transactions/domain/entities/transaction.dart';
@@ -23,13 +24,15 @@ class RecurringTransactionListPage extends StatelessWidget {
     return BlocProvider(
       create: (_) => sl<RecurringTransactionBloc>()
         ..add(LoadRecurringTransactions(userId: userId, activeOnly: true)),
-      child: const _RecurringTransactionListView(),
+      child: _RecurringTransactionListView(userId: userId),
     );
   }
 }
 
 class _RecurringTransactionListView extends StatefulWidget {
-  const _RecurringTransactionListView();
+  final String userId;
+
+  const _RecurringTransactionListView({required this.userId});
 
   @override
   State<_RecurringTransactionListView> createState() =>
@@ -54,7 +57,7 @@ class _RecurringTransactionListViewState
               });
               context.read<RecurringTransactionBloc>().add(
                     LoadRecurringTransactions(
-                      userId: 'user_1',
+                      userId: widget.userId,
                       activeOnly: _activeOnly,
                     ),
                   );
@@ -97,7 +100,7 @@ class _RecurringTransactionListViewState
             // Refresh the list
             context.read<RecurringTransactionBloc>().add(
                   RefreshRecurringTransactions(
-                    userId: 'user_1',
+                    userId: widget.userId,
                     activeOnly: _activeOnly,
                   ),
                 );
@@ -138,7 +141,7 @@ class _RecurringTransactionListViewState
       onRefresh: () async {
         context.read<RecurringTransactionBloc>().add(
               RefreshRecurringTransactions(
-                userId: 'user_1',
+                userId: widget.userId,
                 activeOnly: _activeOnly,
               ),
             );
@@ -321,7 +324,7 @@ class _RecurringTransactionListViewState
             ElevatedButton.icon(
               onPressed: () => context.read<RecurringTransactionBloc>().add(
                     LoadRecurringTransactions(
-                      userId: 'user_1',
+                      userId: widget.userId,
                       activeOnly: _activeOnly,
                     ),
                   ),
@@ -339,6 +342,6 @@ class _RecurringTransactionListViewState
   }
 
   void _navigateToAdd(BuildContext context) {
-    Navigator.of(context).pushNamed('/recurring-transactions/add');
+    context.push('/recurring-transactions/add');
   }
 }

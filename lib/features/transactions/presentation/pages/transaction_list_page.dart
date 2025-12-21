@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../domain/entities/transaction.dart';
 import '../bloc/transaction_bloc.dart';
@@ -100,7 +101,7 @@ class _TransactionListView extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).pushNamed('/transactions/add'),
+        onPressed: () => context.push('/transactions/add'),
         icon: const Icon(Icons.add),
         label: const Text('Add Transaction'),
       ),
@@ -191,9 +192,7 @@ class _TransactionListView extends StatelessWidget {
             color: amountColor,
           ),
         ),
-        onTap: () => Navigator.of(context).pushNamed(
-          '/transactions/${transaction.id}',
-        ),
+        onTap: () => context.push('/transactions/${transaction.id}'),
       ),
     );
   }
