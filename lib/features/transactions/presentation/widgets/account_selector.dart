@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/injection_container.dart';
+import '../../../../core/utils/currency_formatter.dart';
+import '../../../accounts/domain/entities/account.dart';
+import '../../../accounts/presentation/bloc/account_bloc.dart';
+import '../../../accounts/presentation/bloc/account_event.dart';
+import '../../../accounts/presentation/bloc/account_state.dart';
 
 /// Widget for selecting an account
 ///
 /// Displays a list of accounts with icons and balances
 /// Used in transaction forms for account selection
 class AccountSelector extends StatelessWidget {
+  final String userId;
   final String? selectedAccountId;
   final ValueChanged<String?> onAccountSelected;
   final String? label;
@@ -13,6 +21,7 @@ class AccountSelector extends StatelessWidget {
 
   const AccountSelector({
     super.key,
+    required this.userId,
     required this.selectedAccountId,
     required this.onAccountSelected,
     this.label,
@@ -22,110 +31,149 @@ class AccountSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Replace with real accounts from AccountBloc
-    final accounts = _getMockAccounts()
-        .where((account) => account['id'] != excludeAccountId)
-        .toList();
-
-    return DropdownButtonFormField<String>(
-      initialValue: selectedAccountId,
-      decoration: InputDecoration(
-        labelText: label ?? 'Account',
-        border: const OutlineInputBorder(),
-        prefixIcon: const Icon(Icons.account_balance_wallet),
-      ),
-      items: accounts.map((account) {
-        return DropdownMenuItem<String>(
-          value: account['id'] as String,
-          child: Row(
-            children: [
-              Icon(
-                _getAccountIcon(account['type'] as String),
-                size: 20,
-                color: Colors.grey[700],
+    return BlocProvider(
+      create: (_) => sl<AccountBloc>()..add(LoadAccounts(userId: userId)),
+      child: BlocBuilder<AccountBloc, AccountState>(
+        builder: (context, state) {
+          if (state is AccountLoading) {
+            return DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: label ?? 'Account',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.account_balance_wallet),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      account['name'] as String,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    if (showBalance)
-                      Text(
-                        '\$${(account['balance'] as double).toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
+              items: const [],
+              onChanged: null,
+              hint: const Row(
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  SizedBox(width: 12),
+                  Text('Loading accounts...'),
+                ],
+              ),
+            );
+          }
+
+          if (state is AccountError) {
+            return DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: label ?? 'Account',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.account_balance_wallet),
+                errorText: 'Failed to load accounts',
+              ),
+              items: const [],
+              onChanged: null,
+            );
+          }
+
+          if (state is AccountsLoaded) {
+            // Filter active accounts and exclude specified account
+            final accounts = state.accounts
+                .where((account) =>
+                    account.isActive && account.id != excludeAccountId)
+                .toList();
+
+            if (accounts.isEmpty) {
+              return DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: label ?? 'Account',
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.account_balance_wallet),
+                ),
+                items: const [],
+                onChanged: null,
+                hint: const Text('No accounts available'),
+              );
+            }
+
+            return DropdownButtonFormField<String>(
+              value: selectedAccountId,
+              decoration: InputDecoration(
+                labelText: label ?? 'Account',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.account_balance_wallet),
+              ),
+              items: accounts.map((account) {
+                return DropdownMenuItem<String>(
+                  value: account.id,
+                  child: Row(
+                    children: [
+                      Icon(
+                        _getAccountIcon(account.type),
+                        size: 20,
+                        color: Colors.grey[700],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              account.name,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w500),
+                            ),
+                            if (showBalance)
+                              Text(
+                                CurrencyFormatter.format(
+                                  account.balance,
+                                  account.currency,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: account.balance >= 0
+                                      ? Colors.green[700]
+                                      : Colors.red[700],
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-      onChanged: onAccountSelected,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select an account';
-        }
-        return null;
-      },
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: onAccountSelected,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select an account';
+                }
+                return null;
+              },
+            );
+          }
+
+          // Default empty state
+          return DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: label ?? 'Account',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.account_balance_wallet),
+            ),
+            items: const [],
+            onChanged: null,
+          );
+        },
+      ),
     );
   }
 
-  List<Map<String, dynamic>> _getMockAccounts() {
-    return [
-      {
-        'id': 'acc_1',
-        'name': 'Checking Account',
-        'type': 'bank',
-        'balance': 5420.50,
-      },
-      {
-        'id': 'acc_2',
-        'name': 'Savings Account',
-        'type': 'bank',
-        'balance': 15000.00,
-      },
-      {
-        'id': 'acc_3',
-        'name': 'Cash',
-        'type': 'cash',
-        'balance': 250.00,
-      },
-      {
-        'id': 'acc_4',
-        'name': 'Credit Card',
-        'type': 'credit_card',
-        'balance': -1250.75,
-      },
-      {
-        'id': 'acc_5',
-        'name': 'Investment',
-        'type': 'investment',
-        'balance': 25000.00,
-      },
-    ];
-  }
-
-  IconData _getAccountIcon(String type) {
+  IconData _getAccountIcon(AccountType type) {
     switch (type) {
-      case 'bank':
+      case AccountType.bank:
         return Icons.account_balance;
-      case 'cash':
+      case AccountType.cash:
         return Icons.money;
-      case 'credit_card':
+      case AccountType.creditCard:
         return Icons.credit_card;
-      case 'investment':
+      case AccountType.investment:
         return Icons.trending_up;
-      default:
-        return Icons.account_balance_wallet;
     }
   }
 }

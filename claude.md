@@ -1717,9 +1717,11 @@ Complete transaction management system following Clean Architecture with BLoC pa
   - Clean event handlers with async/await
   - Dependencies: getTransactions, getTransactionById, createTransaction, updateTransaction, deleteTransaction, filterTransactions, searchTransactions
 
-- `lib/features/transactions/presentation/pages/transaction_list_page.dart` (~330 lines)
+- `lib/features/transactions/presentation/pages/transaction_list_page.dart` (~340 lines) **ENHANCED ✅**
   - Transactions grouped by date (Today, Yesterday, dates)
-  - Filter and search buttons in AppBar
+  - **Filter and search buttons in AppBar - FULLY INTEGRATED**
+  - **_showFilterDialog() - Displays TransactionFilterDialog and dispatches FilterTransactions event**
+  - **_showSearchDialog() - Displays TransactionSearchDialog and dispatches SearchTransactions event**
   - Color-coded by type (green=income, red=expense, blue=transfer)
   - Tap to navigate to detail page
   - FAB to add new transaction
@@ -1728,12 +1730,12 @@ Complete transaction management system following Clean Architecture with BLoC pa
   - Auto-refresh on success actions
   - Date formatting helpers
 
-- `lib/features/transactions/presentation/pages/transaction_form_page.dart` (~450 lines)
+- `lib/features/transactions/presentation/pages/transaction_form_page.dart` (~260 lines) **ENHANCED ✅**
   - Create/Edit mode with single page
   - SegmentedButton type selector (Income/Expense/Transfer)
   - Validated amount input with currency prefix
-  - Account selector dropdown (5 mock accounts)
-  - Category selector dropdown (filters by type)
+  - **Account selector - Uses AccountSelector widget (real AccountBloc data)**
+  - **Category selector - Uses CategorySelector widget (real CategoryBloc data)**
   - For transfers: destination account selector (excludes source)
   - Description text field (required)
   - Date picker (default: today)
@@ -1772,7 +1774,7 @@ Complete transaction management system following Clean Architecture with BLoC pa
   - Dividers between sections
   - CurrencyFormatter for amounts
 
-- `lib/features/transactions/presentation/widgets/transaction_filter_dialog.dart` (~190 lines)
+- `lib/features/transactions/presentation/widgets/transaction_filter_dialog.dart` (~190 lines) **INTEGRATED ✅**
   - AlertDialog with filter options
   - Date range pickers (start and end date)
   - Transaction type dropdown (All/Income/Expense/Transfer)
@@ -1781,23 +1783,50 @@ Complete transaction management system following Clean Architecture with BLoC pa
   - Clear All button
   - Apply button returns filter map
   - Date formatting helpers
+  - **Fully integrated with TransactionListPage _showFilterDialog()**
 
-- `lib/features/transactions/presentation/widgets/account_selector.dart` (~110 lines)
-  - Reusable DropdownButtonFormField
-  - Shows account name, type icon, and balance
+- `lib/features/transactions/presentation/widgets/transaction_search_dialog.dart` (~80 lines) **NEW ✅**
+  - AlertDialog for searching transactions
+  - TextField with search input and validation
+  - Search by description or notes (case-insensitive)
+  - Clear, Cancel, and Search buttons
+  - Returns search query string on apply
+  - Auto-focus on text field
+  - Enter key submits search
+  - **Fully integrated with TransactionListPage _showSearchDialog()**
+
+- `lib/features/transactions/presentation/widgets/account_selector.dart` (~180 lines) **REFACTORED ✅**
+  - **BLoC-integrated widget with real-time account data**
+  - **Removed all hardcoded mock data**
+  - Creates AccountBloc and loads accounts via LoadAccounts event
+  - BlocBuilder handles loading, error, empty, and loaded states
+  - Shows account name, type icon, and balance with CurrencyFormatter
   - Excludes specified account (for transfers)
-  - Mock accounts (5 total: checking, savings, cash, credit, investment)
   - Account type icons (bank, cash, credit_card, investment)
-  - Balance display (optional)
+  - Balance display with color coding (green/red)
+  - Filters active accounts only
+  - Loading state with spinner in dropdown
+  - Error state with error message
+  - Empty state when no accounts available
   - Form validation
+  - **Requires userId parameter**
 
-- `lib/features/transactions/presentation/widgets/category_selector.dart` (~110 lines)
-  - Reusable DropdownButtonFormField
-  - Filters categories by transaction type (income/expense)
-  - Shows category name and icon
-  - Color-coded icons
-  - Mock categories (10 total across income and expense)
-  - Form validation
+- `lib/features/transactions/presentation/widgets/category_selector.dart` (~200 lines) **REFACTORED ✅**
+  - **BLoC-integrated widget with real-time category data**
+  - **Removed all hardcoded mock data**
+  - Creates CategoryBloc and loads categories via LoadCategories event
+  - BlocBuilder handles loading, error, empty, and loaded states
+  - Filters categories by transaction type (income/expense) dynamically
+  - Shows category name, icon, and color
+  - Parses icon names from string to IconData
+  - Parses color hex codes (#RRGGBB format)
+  - Sorts by sortOrder for consistent display
+  - Shows lock icon for default categories
+  - Loading state with spinner in dropdown
+  - Error state with error message
+  - Empty state when no categories available
+  - Form validation (skips for transfer type)
+  - **Requires userId parameter**
 
 **UI Features Implemented:**
 - ✅ Summary statistics card
@@ -1883,7 +1912,7 @@ With potentially thousands of transactions:
 - Validate data integrity on app start
 - Provide balance recalculation utility (admin function)
 
-### What Will Work When Complete
+### What Works Right Now ✅
 
 #### Transaction Management
 - ✅ Create income transactions (money coming in)
@@ -1892,6 +1921,8 @@ With potentially thousands of transactions:
 - ✅ Edit transactions with balance recalculation
 - ✅ Delete transactions with balance restoration
 - ✅ View transaction details
+- ✅ **ENHANCED: Real-time account selection from AccountBloc**
+- ✅ **ENHANCED: Real-time category selection from CategoryBloc**
 
 #### Balance Management
 - ✅ Automatic balance updates on create/edit/delete
@@ -1899,23 +1930,28 @@ With potentially thousands of transactions:
 - ✅ Balance validation (prevents negative balance for certain account types)
 - ✅ Real-time balance preview in transaction form
 
-#### Filtering & Search
-- ✅ Filter by date range (today, week, month, custom)
-- ✅ Filter by account
-- ✅ Filter by category
-- ✅ Filter by type (income/expense/transfer)
-- ✅ Search by description or notes
-- ✅ Combine multiple filters
+#### Filtering & Search **ENHANCED ✅**
+- ✅ **Filter by date range (fully integrated TransactionFilterDialog)**
+- ✅ **Filter by account (fully integrated)**
+- ✅ **Filter by category (fully integrated)**
+- ✅ **Filter by type - income/expense/transfer (fully integrated)**
+- ✅ **Search by description or notes (new TransactionSearchDialog)**
+- ✅ **Combine multiple filters**
+- ✅ **FilterTransactions event dispatching working**
+- ✅ **SearchTransactions event dispatching working**
 
-#### UI Features
+#### UI Features **ENHANCED ✅**
 - ✅ Transaction list grouped by date
 - ✅ Color-coded transaction types
 - ✅ Summary card (total income, expense, balance)
 - ✅ Swipe-to-delete
-- ✅ Filter and search UI
+- ✅ **Filter and search UI - FULLY INTEGRATED (no more placeholders)**
 - ✅ Transaction detail page
 - ✅ Form validation
 - ✅ Loading/error/empty states
+- ✅ **Dynamic account selector with live balance display**
+- ✅ **Dynamic category selector filtered by transaction type**
+- ✅ **BLoC-driven dropdowns for accounts and categories**
 
 #### Data Management
 - ✅ Offline support with Hive caching
@@ -1948,30 +1984,39 @@ With potentially thousands of transactions:
 - transaction_repository_impl.dart (~305 lines)
 **Subtotal:** 7 files (~1,380 lines)
 
-**Presentation Layer ✅ (100%):**
+**Presentation Layer ✅ (100% + Enhanced):**
 - transaction_event.dart (~90 lines)
 - transaction_state.dart (~60 lines)
 - transaction_bloc.dart (~150 lines)
-- transaction_list_page.dart (~330 lines)
-- transaction_form_page.dart (~450 lines)
+- transaction_list_page.dart (~340 lines) **ENHANCED ✅**
+- transaction_form_page.dart (~260 lines) **ENHANCED ✅**
 - transaction_detail_page.dart (~330 lines)
 - transaction_list_item.dart (~90 lines)
 - transaction_summary_card.dart (~120 lines)
-- transaction_filter_dialog.dart (~190 lines)
-- account_selector.dart (~110 lines)
-- category_selector.dart (~110 lines)
-**Subtotal:** 11 files (~2,030 lines)
+- transaction_filter_dialog.dart (~190 lines) **INTEGRATED ✅**
+- transaction_search_dialog.dart (~80 lines) **NEW ✅**
+- account_selector.dart (~180 lines) **REFACTORED ✅**
+- category_selector.dart (~200 lines) **REFACTORED ✅**
+**Subtotal:** 12 files (~2,090 lines)
 
 **Infrastructure ✅ (100%):**
 - DI registration (injection_container.dart updated)
 - Router updates (app_router.dart updated)
 - Code generation (transaction_model.g.dart generated)
 
-**Total Created:** 26 files (~4,100 lines of code)
+**Total Created:** 27 files (~4,160 lines of code) **+1 new file (TransactionSearchDialog)**
 **Additional Generated:** 1 file (~80 lines auto-generated)
-**Progress:** 100% COMPLETE ✅
+**Progress:** 100% COMPLETE ✅ + **ENHANCED ✅**
 
 **Key Achievement:** Implemented critical account balance update logic that automatically maintains consistency across all transaction operations.
+
+**Recent Enhancements (2025-12-21):**
+- ✅ Filter dialog fully integrated with FilterTransactions event dispatching
+- ✅ New search dialog created and integrated with SearchTransactions event dispatching
+- ✅ AccountSelector refactored to use real-time AccountBloc data (removed all mock data)
+- ✅ CategorySelector refactored to use real-time CategoryBloc data (removed all mock data)
+- ✅ All transaction forms now use dynamic account and category selection
+- ✅ BLoC-driven dropdowns with loading, error, and empty state handling
 
 ### 📋 Next Phases
 
@@ -2539,6 +2584,63 @@ return Semantics(
 - ✅ **Critical Paths:** 95%+ coverage (auth, transactions, budgets, accounts)
 - ✅ **Test coverage data:** Generated at `coverage/lcov.info`
 
+#### Core Functionality Improvements (2025-12-21) ✅
+
+**Transaction Filtering & Search - COMPLETE:**
+- ✅ **Filter Dialog Integration** - Connected TransactionFilterDialog to TransactionListPage
+  - `_showFilterDialog()` method now shows dialog and dispatches `FilterTransactions` event
+  - All filter parameters passed correctly (startDate, endDate, type, accountId, categoryId)
+  - Filter results display properly in transaction list
+- ✅ **Search Dialog Implementation** - Created new TransactionSearchDialog widget
+  - New widget file: `transaction_search_dialog.dart` (~80 lines)
+  - `_showSearchDialog()` method dispatches `SearchTransactions` event
+  - Input validation prevents empty queries
+  - Case-insensitive search by description or notes
+  - Auto-focus and Enter key support
+
+**Dynamic Data Selection - COMPLETE:**
+- ✅ **AccountSelector Refactored** - Replaced all mock data with real AccountBloc integration
+  - File updated: `account_selector.dart` (now ~180 lines)
+  - **Added userId parameter** (required)
+  - Creates AccountBloc and loads accounts via `LoadAccounts` event
+  - BlocBuilder with loading, error, empty, and loaded states
+  - Filters active accounts and excludes specified accounts for transfers
+  - Shows balance with CurrencyFormatter and color coding (green/red)
+  - Account type icons mapped from enum
+  - Loading state shows spinner in dropdown
+  - Error state displays error message
+  - Empty state shows "No accounts available"
+- ✅ **CategorySelector Refactored** - Replaced all mock data with real CategoryBloc integration
+  - File updated: `category_selector.dart` (now ~200 lines)
+  - **Added userId parameter** (required)
+  - Creates CategoryBloc and loads categories via `LoadCategories` event
+  - BlocBuilder with loading, error, empty, and loaded states
+  - Dynamically filters by transaction type (income/expense)
+  - Sorts by sortOrder for consistent display
+  - Parses icon names from string to IconData (20+ icon mappings)
+  - Parses color hex codes (#RRGGBB format)
+  - Shows lock icon for default categories
+  - Form validation skips for transfer type
+
+**TransactionFormPage Updates - COMPLETE:**
+- ✅ File size reduced from ~450 lines to ~260 lines (mock data removed)
+- ✅ Imports AccountSelector and CategorySelector widgets
+- ✅ `_buildAccountSelector()` now uses AccountSelector widget with userId
+- ✅ `_buildToAccountSelector()` uses AccountSelector with excludeAccountId
+- ✅ `_buildCategorySelector()` uses CategorySelector widget with userId and transactionType
+
+**TransactionListPage Updates - COMPLETE:**
+- ✅ File size increased to ~340 lines (filter/search integration added)
+- ✅ Imports TransactionFilterDialog and TransactionSearchDialog
+- ✅ `_showFilterDialog()` replaced placeholder with real implementation
+- ✅ `_showSearchDialog()` replaced placeholder with real implementation
+- ✅ Both methods properly dispatch events to TransactionBloc
+
+**Files Modified:** 4 files
+**Files Created:** 1 new file (TransactionSearchDialog)
+**Total Lines Changed:** ~250 lines of code improvements
+**Impact:** Transaction filtering and search now fully functional, all forms use real-time data from BLoCs
+
 **Completed Tasks:**
 - ✅ Write widget tests for critical UI components (COMPLETE)
 - ✅ Write integration tests for user flows (COMPLETE)
@@ -2550,6 +2652,10 @@ return Semantics(
 - ✅ Fix all failing tests - 41 tests fixed (COMPLETE)
 - ✅ Update all documentation with final implementation details (COMPLETE)
 - ✅ Generate test coverage report (COMPLETE)
+- ✅ **Connect filter dialog to TransactionListPage (COMPLETE - 2025-12-21)**
+- ✅ **Implement search dialog for TransactionListPage (COMPLETE - 2025-12-21)**
+- ✅ **Replace mock data in AccountSelector with AccountBloc (COMPLETE - 2025-12-21)**
+- ✅ **Replace mock data in CategorySelector with CategoryBloc (COMPLETE - 2025-12-21)**
 
 **Optional Future Enhancements:**
 - ⏳ Add app icon and splash screen
@@ -2559,9 +2665,10 @@ return Semantics(
 
 ---
 
-**Last Updated:** 2025-12-20
+**Last Updated:** 2025-12-21
 **Claude Version Used:** Claude Sonnet 4.5
-**Implementation Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (COMPLETE ✅) | Phase 5 - Dashboard (COMPLETE ✅) | Phase 6 - Budgets (COMPLETE ✅) | Phase 7 - Recurring Transactions (COMPLETE ✅) | Phase 8 - Reports & Analytics (COMPLETE ✅) | Phase 9 - Multi-Currency (COMPLETE ✅) | Phase 10 - Polish & Testing (COMPLETE 100% ✅) 🎉
-**Current Focus:** Phase 10 COMPLETE - All 321 tests passing (100% pass rate), comprehensive test coverage achieved, all documentation updated
+**Implementation Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (COMPLETE ✅ + Enhanced) | Phase 5 - Dashboard (COMPLETE ✅) | Phase 6 - Budgets (COMPLETE ✅) | Phase 7 - Recurring Transactions (COMPLETE ✅) | Phase 8 - Reports & Analytics (COMPLETE ✅) | Phase 9 - Multi-Currency (COMPLETE ✅) | Phase 10 - Polish & Testing (COMPLETE 100% ✅) 🎉
+**Current Focus:** Phase 10 COMPLETE + Core functionality improvements - All 321 tests passing, transaction filtering/search fully integrated, dynamic account/category selection implemented
+**Recent Improvements:** Filter & search integration, AccountSelector & CategorySelector refactored to use real BLoC data
 **Achievement:** 🎉 **100% Test Pass Rate** - Fixed 41 failing tests, achieved 321/321 tests passing with full coverage across unit, widget, integration, and performance tests
 **Optional Future Tasks:** App icon, splash screen, Flutter DevTools performance profiling

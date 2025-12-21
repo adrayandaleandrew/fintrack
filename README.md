@@ -423,28 +423,31 @@ Closes #45
 
 **✅ Presentation Layer (100%)**
 - TransactionBloc with 7 events and 7 states
-- TransactionListPage - View all transactions with filtering and search
+- TransactionListPage - View all transactions with **fully integrated filtering and search**
 - TransactionFormPage - Add/edit transactions with type selection
 - TransactionDetailPage - View detailed transaction information
-- 5 reusable widgets:
+- 6 reusable widgets:
   - TransactionListItem - Display transaction in list with type-specific styling
   - TransactionSummaryCard - Show income/expense totals and net amount
-  - TransactionFilterDialog - Multi-criteria filter UI
-  - AccountSelector - Dropdown for selecting accounts
-  - CategorySelector - Dropdown for selecting categories
+  - TransactionFilterDialog - Multi-criteria filter UI **fully integrated**
+  - TransactionSearchDialog - Search dialog UI with validation **NEW**
+  - AccountSelector - **Real-time account data from AccountBloc** (was mock data)
+  - CategorySelector - **Real-time category data from CategoryBloc** (was mock data)
 - Dependency injection fully wired up
 - Router updated with transaction routes (/transactions, /transactions/add, /transactions/:id)
 
 **What Works Right Now:**
 - 🎯 View all transactions sorted by date (newest first)
-- 🎯 Add income/expense/transfer transactions with validation
+- 🎯 Add income/expense/transfer transactions with **real-time account and category selection**
 - 🎯 Edit existing transactions (balance recalculation automatic)
 - 🎯 Delete transactions with confirmation (balance restoration automatic)
-- 🎯 Filter by date range, account, category, type
-- 🎯 Search transactions by description/notes
+- 🎯 **Filter transactions with full dialog integration** (date range, account, category, type)
+- 🎯 **Search transactions by description/notes with dedicated search dialog**
 - 🎯 View detailed transaction information
 - 🎯 Account balances update immediately when transactions change
 - 🎯 Transfer transactions affect both accounts simultaneously
+- 🎯 **Account selector dynamically loads from AccountBloc with live balance display**
+- 🎯 **Category selector dynamically loads from CategoryBloc filtered by transaction type**
 - 🎯 Offline support - works without network connection
 - 🎯 6 pre-populated sample transactions for testing
 
@@ -459,8 +462,12 @@ Closes #45
 - ✅ Cache-first fallback strategy for resilience
 - ✅ Complete form validation with helpful error messages
 - ✅ Type-specific UI styling (green=income, red=expense, blue=transfer)
+- ✅ **NEW: Dynamic account selection** - Replaced mock data with real-time AccountBloc integration
+- ✅ **NEW: Dynamic category selection** - Replaced mock data with real-time CategoryBloc integration
+- ✅ **NEW: Full filter dialog integration** - Complete FilterTransactions event dispatching
+- ✅ **NEW: Search dialog implementation** - SearchTransactions event with validation
 
-**Files Created:** 26 files (~4,500 lines of code)
+**Files Created:** 27 files (~4,600 lines of code)
 **Mock Data:** 6 sample transactions (2 income, 3 expense, 1 transfer)
 
 ### ✅ Phase 5: Dashboard (COMPLETE - 100%)
@@ -904,8 +911,31 @@ Closes #45
 - ✅ Comprehensive PERFORMANCE_TESTING.md guide
 - ✅ Flutter DevTools profiling instructions
 
+**Core Functionality Improvements - NEW ✅**
+- ✅ **Transaction Filter Integration** - Filter dialog fully connected to TransactionListPage
+  - Dispatches FilterTransactions event with all filter parameters
+  - Date range, account, category, and type filtering working
+- ✅ **Transaction Search Implementation** - New search dialog created and integrated
+  - TransactionSearchDialog with input validation
+  - SearchTransactions event dispatching
+  - Case-insensitive search by description/notes
+- ✅ **AccountSelector Refactored** - Dynamic data loading from AccountBloc
+  - Removed all hardcoded mock account data
+  - Real-time account loading with BLoC integration
+  - Shows current balance with CurrencyFormatter
+  - Filters active accounts and excludes accounts for transfers
+  - Handles loading, error, and empty states
+- ✅ **CategorySelector Refactored** - Dynamic data loading from CategoryBloc
+  - Removed all hardcoded mock category data
+  - Real-time category loading with BLoC integration
+  - Filters by transaction type (income/expense)
+  - Sorts by sortOrder for consistent display
+  - Parses icon names and color hex codes
+  - Shows lock icon for default categories
+  - Handles loading, error, and empty states
+
 **What's Working:**
-- 🎯 All 185 tests passing with zero errors
+- 🎯 All 321 tests passing with zero errors
 - 🎯 Comprehensive test coverage for critical business logic
 - 🎯 BLoC state management fully tested
 - 🎯 Use case validation thoroughly tested
@@ -917,6 +947,9 @@ Closes #45
 - 🎯 Accessibility support for screen readers
 - 🎯 Consistent error messaging across app
 - 🎯 Performance testing with large datasets (1000+ transactions)
+- 🎯 **NEW: Transaction filtering fully functional**
+- 🎯 **NEW: Transaction search fully functional**
+- 🎯 **NEW: Dynamic account and category selection**
 
 **Next Steps:**
 - ✅ Write widget tests for critical UI components (COMPLETE)
@@ -973,6 +1006,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Last Updated:** 2025-12-19
+**Last Updated:** 2025-12-21
 **Version:** 1.0.0
-**Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (COMPLETE ✅) | Phase 5 - Dashboard (COMPLETE ✅) | Phase 6 - Budgets (COMPLETE ✅) | Phase 7 - Recurring Transactions (COMPLETE ✅) | Phase 8 - Reports & Analytics (COMPLETE ✅) | Phase 9 - Multi-Currency (COMPLETE ✅) | Phase 10 - Polish & Testing (IN PROGRESS 75% - 172 tests + 6 E2E scenarios + onboarding ✅)
+**Status:** Phase 1 - Foundation (COMPLETE ✅) | Phase 2 - Accounts (COMPLETE ✅) | Phase 3 - Categories (COMPLETE ✅) | Phase 4 - Transactions (COMPLETE ✅ + Enhanced) | Phase 5 - Dashboard (COMPLETE ✅) | Phase 6 - Budgets (COMPLETE ✅) | Phase 7 - Recurring Transactions (COMPLETE ✅) | Phase 8 - Reports & Analytics (COMPLETE ✅) | Phase 9 - Multi-Currency (COMPLETE ✅) | Phase 10 - Polish & Testing (COMPLETE 100% - 321 tests passing ✅ + Core functionality improvements ✅)

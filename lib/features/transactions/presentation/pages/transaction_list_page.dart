@@ -5,6 +5,8 @@ import '../../domain/entities/transaction.dart';
 import '../bloc/transaction_bloc.dart';
 import '../bloc/transaction_event.dart';
 import '../bloc/transaction_state.dart';
+import '../widgets/transaction_filter_dialog.dart';
+import '../widgets/transaction_search_dialog.dart';
 
 /// Page displaying list of all transactions
 ///
@@ -15,20 +17,27 @@ import '../bloc/transaction_state.dart';
 /// - Navigate to transaction detail
 /// - Quick action to add new transaction
 class TransactionListPage extends StatelessWidget {
-  const TransactionListPage({super.key});
+  final String userId;
+
+  const TransactionListPage({
+    super.key,
+    required this.userId,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<TransactionBloc>()
-        ..add(const LoadTransactions(userId: 'user_1')),
-      child: const _TransactionListView(),
+        ..add(LoadTransactions(userId: userId)),
+      child: _TransactionListView(userId: userId),
     );
   }
 }
 
 class _TransactionListView extends StatelessWidget {
-  const _TransactionListView();
+  final String userId;
+
+  const _TransactionListView({required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +75,7 @@ class _TransactionListView extends StatelessWidget {
             );
             // Reload transactions after successful action
             context.read<TransactionBloc>().add(
-                  const LoadTransactions(userId: 'user_1'),
+                  LoadTransactions(userId: userId),
                 );
           }
         },
@@ -249,7 +258,7 @@ class _TransactionListView extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () => context.read<TransactionBloc>().add(
-                  const LoadTransactions(userId: 'user_1'),
+                  LoadTransactions(userId: userId),
                 ),
             icon: const Icon(Icons.refresh),
             label: const Text('Retry'),
@@ -315,17 +324,41 @@ class _TransactionListView extends StatelessWidget {
     return months[month - 1];
   }
 
-  void _showSearchDialog(BuildContext context) {
-    // TODO: Implement search dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Search feature coming soon')),
+  void _showSearchDialog(BuildContext context) async {
+    final query = await showDialog<String>(
+      context: context,
+      builder: (context) => const TransactionSearchDialog(),
     );
+
+    if (query != null && query.isNotEmpty && context.mounted) {
+      // Dispatch search event to BLoC
+      context.read<TransactionBloc>().add(
+            SearchTransactions(
+              userId: userId,
+              query: query,
+            ),
+          );
+    }
   }
 
-  void _showFilterDialog(BuildContext context) {
-    // TODO: Implement filter dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Filter feature coming soon')),
+  void _showFilterDialog(BuildContext context) async {
+    final filters = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => const TransactionFilterDialog(),
     );
+
+    if (filters != null && context.mounted) {
+      // Dispatch filter event to BLoC
+      context.read<TransactionBloc>().add(
+            FilterTransactions(
+              userId: userId,
+              startDate: filters['startDate'] as DateTime?,
+              endDate: filters['endDate'] as DateTime?,
+              type: filters['type'] as TransactionType?,
+              accountId: filters['accountId'] as String?,
+              categoryId: filters['categoryId'] as String?,
+            ),
+          );
+    }
   }
 }

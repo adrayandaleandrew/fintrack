@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../domain/entities/transaction.dart';
+import '../../../categories/domain/entities/category.dart';
+import '../../../categories/presentation/bloc/category_bloc.dart';
+import '../../../categories/presentation/bloc/category_event.dart';
+import '../../../categories/presentation/bloc/category_state.dart';
 
 /// Widget for selecting a category
 ///
 /// Displays categories grouped by type (Income/Expense)
 /// Used in transaction forms for category selection
 class CategorySelector extends StatelessWidget {
+  final String userId;
   final String? selectedCategoryId;
   final ValueChanged<String?> onCategorySelected;
   final TransactionType transactionType;
@@ -13,6 +20,7 @@ class CategorySelector extends StatelessWidget {
 
   const CategorySelector({
     super.key,
+    required this.userId,
     required this.selectedCategoryId,
     required this.onCategorySelected,
     required this.transactionType,
@@ -21,178 +29,175 @@ class CategorySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Replace with real categories from CategoryBloc
-    final categories = _getMockCategories()
-        .where((category) => category['type'] == _getCategoryType())
-        .toList();
+    return BlocProvider(
+      create: (_) => sl<CategoryBloc>()..add(LoadCategories(userId: userId)),
+      child: BlocBuilder<CategoryBloc, CategoryState>(
+        builder: (context, state) {
+          if (state is CategoryLoading) {
+            return DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: label ?? 'Category',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.category),
+              ),
+              items: const [],
+              onChanged: null,
+              hint: const Row(
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  SizedBox(width: 12),
+                  Text('Loading categories...'),
+                ],
+              ),
+            );
+          }
 
-    return DropdownButtonFormField<String>(
-      initialValue: selectedCategoryId,
-      decoration: InputDecoration(
-        labelText: label ?? 'Category',
-        border: const OutlineInputBorder(),
-        prefixIcon: const Icon(Icons.category),
+          if (state is CategoryError) {
+            return DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: label ?? 'Category',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.category),
+                errorText: 'Failed to load categories',
+              ),
+              items: const [],
+              onChanged: null,
+            );
+          }
+
+          if (state is CategoriesLoaded) {
+            // Filter categories by transaction type
+            final categoryType = transactionType == TransactionType.income
+                ? CategoryType.income
+                : CategoryType.expense;
+
+            final categories = state.categories
+                .where((category) => category.type == categoryType)
+                .toList()
+              ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+
+            if (categories.isEmpty) {
+              return DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: label ?? 'Category',
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.category),
+                ),
+                items: const [],
+                onChanged: null,
+                hint: Text(
+                    'No ${categoryType.displayName.toLowerCase()} categories'),
+              );
+            }
+
+            return DropdownButtonFormField<String>(
+              value: selectedCategoryId,
+              decoration: InputDecoration(
+                labelText: label ?? 'Category',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.category),
+              ),
+              items: categories.map((category) {
+                return DropdownMenuItem<String>(
+                  value: category.id,
+                  child: Row(
+                    children: [
+                      Icon(
+                        _getCategoryIcon(category.icon),
+                        size: 20,
+                        color: _parseColor(category.color),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          category.name,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (category.isDefault)
+                        const Icon(
+                          Icons.lock_outline,
+                          size: 14,
+                          color: Colors.grey,
+                        ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: onCategorySelected,
+              validator: (value) {
+                if (transactionType != TransactionType.transfer &&
+                    (value == null || value.isEmpty)) {
+                  return 'Please select a category';
+                }
+                return null;
+              },
+            );
+          }
+
+          // Default empty state
+          return DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+              labelText: label ?? 'Category',
+              border: const OutlineInputBorder(),
+              prefixIcon: const Icon(Icons.category),
+            ),
+            items: const [],
+            onChanged: null,
+          );
+        },
       ),
-      items: categories.map((category) {
-        return DropdownMenuItem<String>(
-          value: category['id'] as String,
-          child: Row(
-            children: [
-              Icon(
-                _getCategoryIcon(category['icon'] as String),
-                size: 20,
-                color: _getCategoryColor(category['color'] as String),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                category['name'] as String,
-                style: const TextStyle(fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-      onChanged: onCategorySelected,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a category';
-        }
-        return null;
-      },
     );
   }
 
-  String _getCategoryType() {
-    if (transactionType == TransactionType.income) {
-      return 'income';
-    } else if (transactionType == TransactionType.expense) {
-      return 'expense';
-    }
-    return 'expense'; // Default
-  }
-
-  List<Map<String, dynamic>> _getMockCategories() {
-    return [
-      // Income categories
-      {
-        'id': 'cat_1',
-        'name': 'Salary',
-        'type': 'income',
-        'icon': 'work',
-        'color': 'green',
-      },
-      {
-        'id': 'cat_2',
-        'name': 'Freelance',
-        'type': 'income',
-        'icon': 'laptop',
-        'color': 'blue',
-      },
-      {
-        'id': 'cat_3',
-        'name': 'Business',
-        'type': 'income',
-        'icon': 'business',
-        'color': 'purple',
-      },
-      {
-        'id': 'cat_4',
-        'name': 'Investments',
-        'type': 'income',
-        'icon': 'trending_up',
-        'color': 'teal',
-      },
-      // Expense categories
-      {
-        'id': 'cat_11',
-        'name': 'Food & Dining',
-        'type': 'expense',
-        'icon': 'restaurant',
-        'color': 'orange',
-      },
-      {
-        'id': 'cat_12',
-        'name': 'Groceries',
-        'type': 'expense',
-        'icon': 'shopping_cart',
-        'color': 'green',
-      },
-      {
-        'id': 'cat_13',
-        'name': 'Transportation',
-        'type': 'expense',
-        'icon': 'directions_car',
-        'color': 'blue',
-      },
-      {
-        'id': 'cat_14',
-        'name': 'Shopping',
-        'type': 'expense',
-        'icon': 'shopping_bag',
-        'color': 'pink',
-      },
-      {
-        'id': 'cat_15',
-        'name': 'Entertainment',
-        'type': 'expense',
-        'icon': 'movie',
-        'color': 'purple',
-      },
-      {
-        'id': 'cat_16',
-        'name': 'Bills & Utilities',
-        'type': 'expense',
-        'icon': 'receipt',
-        'color': 'red',
-      },
-    ];
-  }
-
   IconData _getCategoryIcon(String iconName) {
-    switch (iconName) {
-      case 'work':
-        return Icons.work;
-      case 'laptop':
-        return Icons.laptop;
-      case 'business':
-        return Icons.business;
-      case 'trending_up':
-        return Icons.trending_up;
-      case 'restaurant':
-        return Icons.restaurant;
-      case 'shopping_cart':
-        return Icons.shopping_cart;
-      case 'directions_car':
-        return Icons.directions_car;
-      case 'shopping_bag':
-        return Icons.shopping_bag;
-      case 'movie':
-        return Icons.movie;
-      case 'receipt':
-        return Icons.receipt;
-      default:
-        return Icons.category;
-    }
+    // Map icon names to IconData
+    const iconMap = {
+      'work': Icons.work,
+      'computer': Icons.computer,
+      'business_center': Icons.business_center,
+      'trending_up': Icons.trending_up,
+      'home': Icons.home,
+      'card_giftcard': Icons.card_giftcard,
+      'star': Icons.star,
+      'receipt': Icons.receipt,
+      'restaurant': Icons.restaurant,
+      'shopping_cart': Icons.shopping_cart,
+      'directions_car': Icons.directions_car,
+      'shopping_bag': Icons.shopping_bag,
+      'movie': Icons.movie,
+      'receipt_long': Icons.receipt_long,
+      'local_hospital': Icons.local_hospital,
+      'school': Icons.school,
+      'flight': Icons.flight,
+      'spa': Icons.spa,
+      'security': Icons.security,
+      'subscriptions': Icons.subscriptions,
+    };
+
+    return iconMap[iconName] ?? Icons.category;
   }
 
-  Color _getCategoryColor(String colorName) {
-    switch (colorName) {
-      case 'green':
-        return Colors.green;
-      case 'blue':
-        return Colors.blue;
-      case 'purple':
-        return Colors.purple;
-      case 'teal':
-        return Colors.teal;
-      case 'orange':
-        return Colors.orange;
-      case 'pink':
-        return Colors.pink;
-      case 'red':
-        return Colors.red;
-      default:
-        return Colors.grey;
+  Color _parseColor(String colorHex) {
+    try {
+      // Remove # if present
+      final hex = colorHex.replaceAll('#', '');
+
+      // Parse hex color
+      if (hex.length == 6) {
+        return Color(int.parse('FF$hex', radix: 16));
+      } else if (hex.length == 8) {
+        return Color(int.parse(hex, radix: 16));
+      }
+    } catch (e) {
+      // If parsing fails, return grey
     }
+
+    return Colors.grey;
   }
 }
