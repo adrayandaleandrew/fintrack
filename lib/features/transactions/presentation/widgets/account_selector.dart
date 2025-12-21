@@ -111,31 +111,10 @@ class AccountSelector extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              account.name,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w500),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            if (showBalance)
-                              Text(
-                                CurrencyFormatter.format(
-                                  amount: account.balance,
-                                  currencyCode: account.currency,
-                                ),
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: account.balance >= 0
-                                      ? Colors.green[700]
-                                      : Colors.red[700],
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                          ],
+                        child: Text(
+                          account.name,
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
