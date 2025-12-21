@@ -366,7 +366,10 @@ class _TransactionDetailView extends StatelessWidget {
   void _navigateToEdit(BuildContext context, Transaction transaction) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => TransactionFormPage(transaction: transaction),
+        builder: (_) => TransactionFormPage(
+          userId: transaction.userId,
+          transaction: transaction,
+        ),
       ),
     );
   }

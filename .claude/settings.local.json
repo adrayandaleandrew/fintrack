@@ -16,7 +16,11 @@
       "Bash(git reset:*)",
       "Bash(git commit:*)",
       "Bash(flutter test:*)",
-      "Bash(findstr:*)"
+      "Bash(findstr:*)",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(tee:*)",
+      "Bash(nc:*)"
     ]
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/register_page.dart';
 import '../../features/auth/presentation/pages/splash_page.dart';
@@ -27,6 +30,25 @@ import 'route_paths.dart';
 class AppRouter {
   // Private constructor to prevent instantiation
   AppRouter._();
+
+  /// Helper method to get the current authenticated user ID from context
+  /// Returns empty string if user is not authenticated
+  static String _getUserId(BuildContext context) {
+    final authState = context.read<AuthBloc>().state;
+
+    if (authState is Authenticated) {
+      return authState.user.id;
+    } else if (authState is LoginSuccess) {
+      return authState.user.id;
+    } else if (authState is RegisterSuccess) {
+      return authState.user.id;
+    } else if (authState is ProfileUpdated) {
+      return authState.user.id;
+    }
+
+    // Fallback for unauthenticated users
+    return '';
+  }
 
   /// Creates and configures the router
   static GoRouter createRouter() {
@@ -72,8 +94,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.dashboard,
           name: RouteNames.dashboard,
-          builder: (context, state) => const DashboardPage(
-            userId: 'user_1', // TODO: Get from auth state
+          builder: (context, state) => DashboardPage(
+            userId: _getUserId(context),
           ),
         ),
 
@@ -81,12 +103,16 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.transactions,
           name: RouteNames.transactions,
-          builder: (context, state) => const TransactionListPage(),
+          builder: (context, state) => TransactionListPage(
+            userId: _getUserId(context),
+          ),
           routes: [
             GoRoute(
               path: 'add',
               name: RouteNames.addTransaction,
-              builder: (context, state) => const TransactionFormPage(),
+              builder: (context, state) => TransactionFormPage(
+                userId: _getUserId(context),
+              ),
             ),
             GoRoute(
               path: ':id',
@@ -114,8 +140,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.accounts,
           name: RouteNames.accounts,
-          builder: (context, state) => const AccountListPage(
-            userId: 'user_1', // TODO: Get from auth state
+          builder: (context, state) => AccountListPage(
+            userId: _getUserId(context),
           ),
           routes: [
             GoRoute(
@@ -155,8 +181,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.categories,
           name: RouteNames.categories,
-          builder: (context, state) => const CategoryListPage(
-            userId: 'user_1', // TODO: Get from auth state
+          builder: (context, state) => CategoryListPage(
+            userId: _getUserId(context),
           ),
           routes: [
             GoRoute(
@@ -185,8 +211,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.budgets,
           name: RouteNames.budgets,
-          builder: (context, state) => const BudgetListPage(
-            userId: 'user_1', // TODO: Get from auth state
+          builder: (context, state) => BudgetListPage(
+            userId: _getUserId(context),
           ),
           routes: [
             GoRoute(
@@ -220,8 +246,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.recurringTransactions,
           name: RouteNames.recurringTransactions,
-          builder: (context, state) => const RecurringTransactionListPage(
-            userId: 'user_1', // TODO: Get from auth state
+          builder: (context, state) => RecurringTransactionListPage(
+            userId: _getUserId(context),
           ),
           routes: [
             GoRoute(
@@ -257,8 +283,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.reports,
           name: RouteNames.reports,
-          builder: (context, state) => const ReportsPage(
-            userId: 'user_1', // TODO: Get from auth state
+          builder: (context, state) => ReportsPage(
+            userId: _getUserId(context),
           ),
         ),
 
@@ -266,8 +292,8 @@ class AppRouter {
         GoRoute(
           path: RoutePaths.settings,
           name: RouteNames.settings,
-          builder: (context, state) => const SettingsPage(
-            userId: 'user_1', // TODO: Get from auth state
+          builder: (context, state) => SettingsPage(
+            userId: _getUserId(context),
           ),
           routes: [
             GoRoute(
