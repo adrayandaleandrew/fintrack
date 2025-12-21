@@ -18,6 +18,7 @@ import '../../features/budgets/presentation/pages/budget_form_page.dart';
 import '../../features/budgets/presentation/pages/budget_detail_page.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_list_page.dart';
 import '../../features/recurring_transactions/presentation/pages/recurring_transaction_form_page.dart';
+import '../../features/recurring_transactions/domain/entities/recurring_transaction.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/currency/presentation/pages/settings_page.dart';
 import 'route_names.dart';
@@ -253,7 +254,9 @@ class AppRouter {
             GoRoute(
               path: 'add',
               name: RouteNames.addRecurringTransaction,
-              builder: (context, state) => const RecurringTransactionFormPage(),
+              builder: (context, state) => RecurringTransactionFormPage(
+                userId: _getUserId(context),
+              ),
             ),
             GoRoute(
               path: ':id',
@@ -271,8 +274,10 @@ class AppRouter {
               name: RouteNames.editRecurringTransaction,
               builder: (context, state) {
                 final id = state.pathParameters['id']!;
+                final recurringTransaction = state.extra as RecurringTransaction?;
                 return RecurringTransactionFormPage(
-                  recurringTransactionId: id,
+                  userId: _getUserId(context),
+                  recurringTransaction: recurringTransaction,
                 );
               },
             ),
