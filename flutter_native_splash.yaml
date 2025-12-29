@@ -1,0 +1,45 @@
+# Flutter Native Splash Configuration
+# https://pub.dev/packages/flutter_native_splash
+
+flutter_native_splash:
+  # Splash screen background color (green theme)
+  color: "#4CAF50"
+
+  # Splash screen image
+  image: assets/splash/splash_logo.png
+
+  # Brand image (optional, shown at bottom)
+  branding: assets/splash/splash_branding.png
+  branding_bottom_padding: 24
+
+  # Color dark mode
+  color_dark: "#1B5E20"
+
+  # Image dark mode
+  image_dark: assets/splash/splash_logo_dark.png
+
+  # Android 12+
+  android_12:
+    image: assets/splash/splash_logo.png
+    color: "#4CAF50"
+    image_dark: assets/splash/splash_logo_dark.png
+    color_dark: "#1B5E20"
+    icon_background_color: "#4CAF50"
+    icon_background_color_dark: "#1B5E20"
+
+  # Web
+  web: true
+  web_image_mode: center
+
+  # iOS
+  ios: true
+
+  # Android
+  android: true
+
+  # Preserve the splash screen
+  fullscreen: true
+
+  # Maintains aspect ratio
+  android_gravity: center
+  ios_content_mode: scaleAspectFit

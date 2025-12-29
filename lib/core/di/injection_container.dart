@@ -5,6 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+// Core Storage
+import '../../core/storage/hive_encryption_service.dart';
+import '../../core/storage/encrypted_box_helper.dart';
+
 // Authentication
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
 import '../../features/auth/data/datasources/auth_local_datasource_impl.dart';
@@ -130,6 +134,14 @@ import '../../features/currency/domain/usecases/get_exchange_rates.dart';
 import '../../features/currency/domain/usecases/update_base_currency.dart';
 import '../../features/currency/presentation/bloc/currency_bloc.dart';
 
+// Data Export/Import
+import '../../features/data_export/data/repositories/data_export_repository_impl.dart';
+import '../../features/data_export/data/services/csv_formatter.dart';
+import '../../features/data_export/domain/repositories/data_export_repository.dart';
+import '../../features/data_export/domain/usecases/export_data.dart';
+import '../../features/data_export/domain/usecases/import_data.dart';
+import '../../features/data_export/presentation/bloc/data_export_bloc.dart';
+
 /// Service locator instance
 ///
 /// This is the single global instance of GetIt used throughout the app
@@ -164,9 +176,20 @@ Future<void> initializeDependencies() async {
   );
   sl.registerLazySingleton<FlutterSecureStorage>(() => secureStorage);
 
-  // Hive - NoSQL database for local storage
+  // Hive - NoSQL database for local storage with encryption
   await Hive.initFlutter();
   sl.registerLazySingleton<HiveInterface>(() => Hive);
+
+  // Hive Encryption Service - manages encryption keys for secure storage
+  final hiveEncryptionService = HiveEncryptionService(secureStorage);
+  sl.registerLazySingleton<HiveEncryptionService>(() => hiveEncryptionService);
+
+  // Generate or retrieve encryption key on app startup
+  await hiveEncryptionService.getEncryptionKey();
+
+  // Encrypted Box Helper - helper for opening encrypted Hive boxes
+  final encryptedBoxHelper = EncryptedBoxHelper(hiveEncryptionService);
+  sl.registerLazySingleton<EncryptedBoxHelper>(() => encryptedBoxHelper);
 
   // Dio - HTTP client for API calls
   final dio = Dio(
@@ -287,7 +310,7 @@ Future<void> initializeDependencies() async {
   );
 
   sl.registerLazySingleton<AccountLocalDataSource>(
-    () => AccountLocalDataSourceImpl(hive: sl()),
+    () => AccountLocalDataSourceImpl(boxHelper: sl<EncryptedBoxHelper>()),
   );
 
   // Repositories
@@ -324,7 +347,7 @@ Future<void> initializeDependencies() async {
   );
 
   sl.registerLazySingleton<CategoryLocalDataSource>(
-    () => CategoryLocalDataSourceImpl(hive: sl()),
+    () => CategoryLocalDataSourceImpl(boxHelper: sl<EncryptedBoxHelper>()),
   );
 
   // Repositories
@@ -367,7 +390,7 @@ Future<void> initializeDependencies() async {
   );
 
   sl.registerLazySingleton<TransactionLocalDataSource>(
-    () => TransactionLocalDataSourceImpl(hive: sl()),
+    () => TransactionLocalDataSourceImpl(boxHelper: sl<EncryptedBoxHelper>()),
   );
 
   // Repositories
@@ -657,7 +680,7 @@ Future<void> initializeDependencies() async {
   );
 
   sl.registerLazySingleton<CurrencyLocalDataSource>(
-    () => CurrencyLocalDataSourceImpl(),
+    () => CurrencyLocalDataSourceImpl(sl<EncryptedBoxHelper>()),
   );
 
   // Repository
@@ -683,6 +706,34 @@ Future<void> initializeDependencies() async {
       convertCurrency: sl(),
       getBaseCurrency: sl(),
       updateBaseCurrency: sl(),
+    ),
+  );
+
+  // ==================== Data Export/Import ====================
+
+  // Services
+  sl.registerLazySingleton<CsvFormatter>(() => const CsvFormatter());
+
+  // Repositories
+  sl.registerLazySingleton<DataExportRepository>(
+    () => DataExportRepositoryImpl(
+      transactionRepository: sl(),
+      accountRepository: sl(),
+      budgetRepository: sl(),
+      categoryRepository: sl(),
+      csvFormatter: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton<ExportData>(() => ExportData(sl()));
+  sl.registerLazySingleton<ImportData>(() => ImportData(sl()));
+
+  // BLoCs
+  sl.registerFactory<DataExportBloc>(
+    () => DataExportBloc(
+      exportData: sl(),
+      importData: sl(),
     ),
   );
 }

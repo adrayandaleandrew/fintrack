@@ -1,25 +1,25 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/errors/exceptions.dart';
+import '../../../../core/storage/encrypted_box_helper.dart';
 import '../models/transaction_model.dart';
 import '../../domain/entities/transaction.dart';
 import 'transaction_local_datasource.dart';
 
-/// Hive-based local data source for transaction caching
+/// Hive-based local data source for transaction caching with encryption
 ///
+/// All data is encrypted using AES-256 encryption with keys stored in secure storage.
 /// Stores transactions in a Hive box with the structure:
 /// Box<Map<String, dynamic>> where key is userId and value is List of transactions
 class TransactionLocalDataSourceImpl implements TransactionLocalDataSource {
-  final HiveInterface hive;
+  final EncryptedBoxHelper _boxHelper;
   static const String _boxName = 'transactions';
 
-  TransactionLocalDataSourceImpl({required this.hive});
+  TransactionLocalDataSourceImpl({required EncryptedBoxHelper boxHelper})
+      : _boxHelper = boxHelper;
 
-  /// Get or open the Hive box
+  /// Get or open the encrypted Hive box
   Future<Box<Map<dynamic, dynamic>>> _getBox() async {
-    if (!hive.isBoxOpen(_boxName)) {
-      return await hive.openBox<Map<dynamic, dynamic>>(_boxName);
-    }
-    return hive.box<Map<dynamic, dynamic>>(_boxName);
+    return await _boxHelper.openBox<Map<dynamic, dynamic>>(_boxName);
   }
 
   @override

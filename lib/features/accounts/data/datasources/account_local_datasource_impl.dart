@@ -1,24 +1,24 @@
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/errors/exceptions.dart';
+import '../../../../core/storage/encrypted_box_helper.dart';
 import '../models/account_model.dart';
 import 'account_local_datasource.dart';
 
-/// Implementation of AccountLocalDataSource using Hive
+/// Implementation of AccountLocalDataSource using encrypted Hive storage
 ///
+/// All data is encrypted using AES-256 encryption with keys stored in secure storage.
 /// Uses Hive box for caching accounts locally.
 class AccountLocalDataSourceImpl implements AccountLocalDataSource {
-  final HiveInterface hive;
+  final EncryptedBoxHelper _boxHelper;
 
   static const String _boxName = 'accounts';
 
-  const AccountLocalDataSourceImpl({required this.hive});
+  const AccountLocalDataSourceImpl({required EncryptedBoxHelper boxHelper})
+      : _boxHelper = boxHelper;
 
   Future<Box> _getBox() async {
-    if (!hive.isBoxOpen(_boxName)) {
-      return await hive.openBox(_boxName);
-    }
-    return hive.box(_boxName);
+    return await _boxHelper.openBox(_boxName);
   }
 
   @override
