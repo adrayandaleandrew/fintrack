@@ -20,7 +20,9 @@
       "Bash(mkdir:*)",
       "Bash(tree:*)",
       "Bash(tee:*)",
-      "Bash(nc:*)"
+      "Bash(nc:*)",
+      "Bash(grep:*)",
+      "Bash(wc:*)"
     ]
   }
 }
