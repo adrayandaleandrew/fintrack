@@ -1,6 +1,11 @@
+import 'package:finance_tracker/core/di/injection_container.dart';
 import 'package:finance_tracker/features/currency/presentation/bloc/currency_bloc.dart';
 import 'package:finance_tracker/features/currency/presentation/bloc/currency_event.dart';
 import 'package:finance_tracker/features/currency/presentation/bloc/currency_state.dart';
+import 'package:finance_tracker/features/data_export/domain/entities/export_format.dart';
+import 'package:finance_tracker/features/data_export/presentation/bloc/data_export_bloc.dart';
+import 'package:finance_tracker/features/data_export/presentation/bloc/data_export_event.dart';
+import 'package:finance_tracker/features/data_export/presentation/bloc/data_export_state.dart';
 import 'package:finance_tracker/shared/widgets/loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,6 +79,12 @@ class _SettingsPageState extends State<SettingsPage> {
               _buildBaseCurrencyTile(context, state),
               const SizedBox(height: 24),
 
+              // Data Export/Import Section
+              _buildSectionHeader('Data Management'),
+              const SizedBox(height: 8),
+              _buildDataExportTile(context),
+              const SizedBox(height: 24),
+
               // About Section
               _buildSectionHeader('About'),
               const SizedBox(height: 8),
@@ -111,6 +122,81 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => _showCurrencyPicker(context, state),
+      ),
+    );
+  }
+
+  Widget _buildDataExportTile(BuildContext context) {
+    return BlocProvider(
+      create: (_) => sl<DataExportBloc>(),
+      child: BlocConsumer<DataExportBloc, DataExportState>(
+        listener: (context, state) {
+          if (state is DataExportSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 5),
+              ),
+            );
+          } else if (state is DataExportError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          final isLoading = state is DataExportLoading;
+
+          return Card(
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.download),
+                  title: const Text('Export All Data'),
+                  subtitle: const Text('Export all your data to CSV files'),
+                  trailing: isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.chevron_right),
+                  onTap: isLoading
+                      ? null
+                      : () {
+                          context.read<DataExportBloc>().add(
+                                ExportDataRequested(
+                                  userId: widget.userId,
+                                  dataType: ExportDataType.all,
+                                  format: ExportFormat.csv,
+                                ),
+                              );
+                        },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.upload),
+                  title: const Text('Import Data'),
+                  subtitle: const Text('Import data from CSV files (Coming Soon)'),
+                  enabled: false,
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    // TODO: Implement file picker for import
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Import feature coming soon!'),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

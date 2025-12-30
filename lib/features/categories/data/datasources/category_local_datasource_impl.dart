@@ -1,24 +1,24 @@
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../../core/errors/exceptions.dart';
+import '../../../../core/storage/encrypted_box_helper.dart';
 import '../models/category_model.dart';
 import 'category_local_datasource.dart';
 
-/// Implementation of CategoryLocalDataSource using Hive
+/// Implementation of CategoryLocalDataSource using encrypted Hive storage
 ///
+/// All data is encrypted using AES-256 encryption with keys stored in secure storage.
 /// Uses Hive box for caching categories locally.
 class CategoryLocalDataSourceImpl implements CategoryLocalDataSource {
-  final HiveInterface hive;
+  final EncryptedBoxHelper _boxHelper;
 
   static const String _boxName = 'categories';
 
-  const CategoryLocalDataSourceImpl({required this.hive});
+  const CategoryLocalDataSourceImpl({required EncryptedBoxHelper boxHelper})
+      : _boxHelper = boxHelper;
 
   Future<Box> _getBox() async {
-    if (!hive.isBoxOpen(_boxName)) {
-      return await hive.openBox(_boxName);
-    }
-    return hive.box(_boxName);
+    return await _boxHelper.openBox(_boxName);
   }
 
   @override

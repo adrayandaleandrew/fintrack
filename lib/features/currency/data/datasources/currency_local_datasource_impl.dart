@@ -1,13 +1,17 @@
 import 'package:finance_tracker/core/errors/exceptions.dart';
+import 'package:finance_tracker/core/storage/encrypted_box_helper.dart';
 import 'package:finance_tracker/features/currency/data/datasources/currency_local_datasource.dart';
 import 'package:finance_tracker/features/currency/data/models/currency_model.dart';
 import 'package:finance_tracker/features/currency/data/models/exchange_rate_model.dart';
 import 'package:hive/hive.dart';
 
-/// Implementation of CurrencyLocalDataSource using Hive
+/// Implementation of CurrencyLocalDataSource using encrypted Hive storage
 ///
+/// All data is encrypted using AES-256 encryption with keys stored in secure storage.
 /// Caches currencies, exchange rates, and user base currency preferences.
 class CurrencyLocalDataSourceImpl implements CurrencyLocalDataSource {
+  final EncryptedBoxHelper _boxHelper;
+
   static const String currenciesBoxName = 'currencies';
   static const String exchangeRatesBoxName = 'exchange_rates';
   static const String baseCurrencyBoxName = 'base_currency';
@@ -15,10 +19,12 @@ class CurrencyLocalDataSourceImpl implements CurrencyLocalDataSource {
   static const String currenciesKey = 'all_currencies';
   static const String exchangeRatesKey = 'all_exchange_rates';
 
+  const CurrencyLocalDataSourceImpl(this._boxHelper);
+
   @override
   Future<void> cacheCurrencies(List<CurrencyModel> currencies) async {
     try {
-      final box = await Hive.openBox(currenciesBoxName);
+      final box = await _boxHelper.openBox(currenciesBoxName);
       final currenciesJson = currencies.map((c) => c.toJson()).toList();
       await box.put(currenciesKey, currenciesJson);
     } catch (e) {
@@ -29,7 +35,7 @@ class CurrencyLocalDataSourceImpl implements CurrencyLocalDataSource {
   @override
   Future<List<CurrencyModel>> getCachedCurrencies() async {
     try {
-      final box = await Hive.openBox(currenciesBoxName);
+      final box = await _boxHelper.openBox(currenciesBoxName);
       final currenciesJson = box.get(currenciesKey) as List<dynamic>?;
 
       if (currenciesJson == null) {
@@ -48,7 +54,7 @@ class CurrencyLocalDataSourceImpl implements CurrencyLocalDataSource {
   @override
   Future<void> cacheExchangeRates(List<ExchangeRateModel> rates) async {
     try {
-      final box = await Hive.openBox(exchangeRatesBoxName);
+      final box = await _boxHelper.openBox(exchangeRatesBoxName);
       final ratesJson = rates.map((r) => r.toJson()).toList();
       await box.put(exchangeRatesKey, ratesJson);
     } catch (e) {
@@ -59,7 +65,7 @@ class CurrencyLocalDataSourceImpl implements CurrencyLocalDataSource {
   @override
   Future<List<ExchangeRateModel>> getCachedExchangeRates() async {
     try {
-      final box = await Hive.openBox(exchangeRatesBoxName);
+      final box = await _boxHelper.openBox(exchangeRatesBoxName);
       final ratesJson = box.get(exchangeRatesKey) as List<dynamic>?;
 
       if (ratesJson == null) {
@@ -80,7 +86,7 @@ class CurrencyLocalDataSourceImpl implements CurrencyLocalDataSource {
   @override
   Future<void> cacheBaseCurrency(String userId, String currencyCode) async {
     try {
-      final box = await Hive.openBox(baseCurrencyBoxName);
+      final box = await _boxHelper.openBox(baseCurrencyBoxName);
       await box.put(userId, currencyCode);
     } catch (e) {
       throw CacheException('Failed to cache base currency: $e');
@@ -90,7 +96,7 @@ class CurrencyLocalDataSourceImpl implements CurrencyLocalDataSource {
   @override
   Future<String> getCachedBaseCurrency(String userId) async {
     try {
-      final box = await Hive.openBox(baseCurrencyBoxName);
+      final box = await _boxHelper.openBox(baseCurrencyBoxName);
       final currencyCode = box.get(userId) as String?;
 
       if (currencyCode == null) {

@@ -1,0 +1,24 @@
+# Flutter Launcher Icons Configuration
+# https://pub.dev/packages/flutter_launcher_icons
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+
+  # Android adaptive icon
+  adaptive_icon_background: "#4CAF50"  # Green theme color
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+
+  # iOS app icon
+  ios_app_icon: "assets/icon/app_icon.png"
+
+  # Remove old launcher icons
+  remove_alpha_ios: true
+
+  # Web icon
+  web:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    background_color: "#4CAF50"
+    theme_color: "#4CAF50"
